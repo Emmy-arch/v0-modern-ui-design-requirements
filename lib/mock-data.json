@@ -1,0 +1,413 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "John Investor",
+      "email": "john.investor@email.com",
+      "role": "investor",
+      "avatar": "/placeholder.svg?height=40&width=40"
+    },
+    {
+      "id": 2,
+      "name": "Sarah Manager",
+      "email": "sarah.manager@ppp.gov",
+      "role": "staff",
+      "avatar": "/placeholder.svg?height=40&width=40"
+    },
+    {
+      "id": 3,
+      "name": "Michael Director",
+      "email": "michael.director@ppp.gov",
+      "role": "hod",
+      "avatar": "/placeholder.svg?height=40&width=40"
+    },
+    {
+      "id": 4,
+      "name": "Robert CEO",
+      "email": "robert.ceo@ppp.gov",
+      "role": "executive",
+      "avatar": "/placeholder.svg?height=40&width=40"
+    }
+  ],
+  "proposals": [
+    {
+      "id": "PPP-2024-001",
+      "title": "Smart City Infrastructure Development",
+      "description": "Comprehensive smart city infrastructure including IoT sensors, traffic management systems, and digital governance platforms.",
+      "investor": "John Investor",
+      "investorId": 1,
+      "status": "Under Review",
+      "stage": "PAM Assessment",
+      "priority": "high",
+      "submittedDate": "2024-01-15",
+      "lastUpdate": "2024-01-20",
+      "investmentAmount": "$50M",
+      "projectDuration": "36 months",
+      "expectedROI": "18% annually",
+      "riskLevel": "medium",
+      "location": "Metropolitan Area",
+      "category": "infrastructure",
+      "documents": {
+        "ic": {
+          "status": "submitted",
+          "filename": "investment_certificate.pdf",
+          "uploadDate": "2024-01-15"
+        },
+        "nda": {
+          "status": "submitted",
+          "filename": "nda_signed.pdf",
+          "uploadDate": "2024-01-15"
+        },
+        "businessPlan": {
+          "status": "submitted",
+          "filename": "business_plan_v2.pdf",
+          "uploadDate": "2024-01-16"
+        },
+        "pam": {
+          "status": "in_progress",
+          "assignedTo": "Sarah Manager",
+          "dueDate": "2024-02-01"
+        },
+        "pmc": {
+          "status": "pending",
+          "assignedTo": null,
+          "dueDate": null
+        }
+      },
+      "timeline": [
+        {
+          "stage": "IC Submission",
+          "status": "completed",
+          "date": "2024-01-15",
+          "notes": "Investment certificate verified and approved"
+        },
+        {
+          "stage": "NDA Signed",
+          "status": "completed",
+          "date": "2024-01-15",
+          "notes": "Non-disclosure agreement executed"
+        },
+        {
+          "stage": "Business Plan Review",
+          "status": "completed",
+          "date": "2024-01-18",
+          "notes": "Business plan reviewed and accepted by staff"
+        },
+        {
+          "stage": "PAM Assessment",
+          "status": "current",
+          "date": "2024-01-20",
+          "notes": "Project Assessment Memorandum in progress"
+        },
+        {
+          "stage": "PMC Evaluation",
+          "status": "pending",
+          "date": null,
+          "notes": null
+        },
+        {
+          "stage": "Final Approval",
+          "status": "pending",
+          "date": null,
+          "notes": null
+        }
+      ],
+      "staffNotes": [
+        {
+          "author": "Sarah Manager",
+          "date": "2024-01-20",
+          "note": "Strong financial backing and comprehensive business plan. Recommend proceeding to PAM assessment.",
+          "type": "assessment"
+        }
+      ],
+      "hodRecommendation": null,
+      "executiveDecision": null
+    },
+    {
+      "id": "PPP-2024-002",
+      "title": "Healthcare Technology Platform",
+      "description": "Digital healthcare platform integrating telemedicine, patient records, and AI-powered diagnostics.",
+      "investor": "Sarah Johnson",
+      "investorId": 5,
+      "status": "Pending Documents",
+      "stage": "IC Submission",
+      "priority": "medium",
+      "submittedDate": "2024-01-20",
+      "lastUpdate": "2024-01-25",
+      "investmentAmount": "$25M",
+      "projectDuration": "24 months",
+      "expectedROI": "22% annually",
+      "riskLevel": "high",
+      "location": "National",
+      "category": "healthcare",
+      "documents": {
+        "ic": {
+          "status": "missing",
+          "filename": null,
+          "uploadDate": null
+        },
+        "nda": {
+          "status": "submitted",
+          "filename": "nda_healthcare.pdf",
+          "uploadDate": "2024-01-20"
+        },
+        "businessPlan": {
+          "status": "submitted",
+          "filename": "healthcare_plan.pdf",
+          "uploadDate": "2024-01-20"
+        },
+        "pam": {
+          "status": "pending",
+          "assignedTo": null,
+          "dueDate": null
+        },
+        "pmc": {
+          "status": "pending",
+          "assignedTo": null,
+          "dueDate": null
+        }
+      },
+      "timeline": [
+        {
+          "stage": "IC Submission",
+          "status": "pending",
+          "date": null,
+          "notes": "Investment certificate required - 10 days overdue"
+        }
+      ],
+      "staffNotes": [
+        {
+          "author": "Sarah Manager",
+          "date": "2024-01-25",
+          "note": "Reminder sent to investor regarding missing IC document. Business plan shows promise but needs financial verification.",
+          "type": "reminder"
+        }
+      ]
+    },
+    {
+      "id": "PPP-2024-003",
+      "title": "Renewable Energy Project",
+      "description": "Large-scale solar and wind energy project with battery storage and grid integration.",
+      "investor": "Green Energy Corp",
+      "investorId": 6,
+      "status": "Ready for HoD",
+      "stage": "HoD Assessment",
+      "priority": "high",
+      "submittedDate": "2024-01-10",
+      "lastUpdate": "2024-01-25",
+      "investmentAmount": "$75M",
+      "projectDuration": "48 months",
+      "expectedROI": "15% annually",
+      "riskLevel": "medium",
+      "location": "Rural Districts",
+      "category": "energy",
+      "documents": {
+        "ic": {
+          "status": "submitted",
+          "filename": "green_energy_ic.pdf",
+          "uploadDate": "2024-01-10"
+        },
+        "nda": {
+          "status": "submitted",
+          "filename": "green_energy_nda.pdf",
+          "uploadDate": "2024-01-10"
+        },
+        "businessPlan": {
+          "status": "submitted",
+          "filename": "renewable_energy_plan.pdf",
+          "uploadDate": "2024-01-11"
+        },
+        "pam": {
+          "status": "completed",
+          "filename": "pam_renewable_energy.pdf",
+          "completedDate": "2024-01-22"
+        },
+        "pmc": {
+          "status": "completed",
+          "filename": "pmc_renewable_energy.pdf",
+          "completedDate": "2024-01-24"
+        }
+      },
+      "timeline": [
+        {
+          "stage": "IC Submission",
+          "status": "completed",
+          "date": "2024-01-10",
+          "notes": "Investment certificate verified"
+        },
+        {
+          "stage": "NDA Signed",
+          "status": "completed",
+          "date": "2024-01-10",
+          "notes": "NDA executed successfully"
+        },
+        {
+          "stage": "Business Plan Review",
+          "status": "completed",
+          "date": "2024-01-12",
+          "notes": "Comprehensive business plan approved"
+        },
+        {
+          "stage": "PAM Assessment",
+          "status": "completed",
+          "date": "2024-01-22",
+          "notes": "Project assessment completed with positive recommendation"
+        },
+        {
+          "stage": "PMC Evaluation",
+          "status": "completed",
+          "date": "2024-01-24",
+          "notes": "Project management capability assessment completed"
+        },
+        {
+          "stage": "HoD Review",
+          "status": "current",
+          "date": "2024-01-25",
+          "notes": "Escalated to Head of Department for review"
+        }
+      ],
+      "staffNotes": [
+        {
+          "author": "Sarah Manager",
+          "date": "2024-01-25",
+          "note": "Excellent proposal with strong financial backing and proven track record. All documentation complete. Recommend for approval.",
+          "type": "recommendation"
+        }
+      ],
+      "hodRecommendation": {
+        "recommendation": "approve",
+        "notes": "Strong proposal with comprehensive risk mitigation. Recommend for executive approval.",
+        "date": "2024-01-30",
+        "author": "Michael Director"
+      }
+    }
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "from": "Sarah Manager",
+      "to": "John Investor",
+      "subject": "Additional Documentation Required",
+      "content": "We need clarification on the financial projections in your business plan. Please provide updated cash flow statements for years 3-5.",
+      "timestamp": "2024-01-30T14:00:00Z",
+      "read": false,
+      "proposalId": "PPP-2024-001"
+    },
+    {
+      "id": 2,
+      "from": "System",
+      "to": "John Investor",
+      "subject": "Proposal Status Update",
+      "content": "Your proposal 'Smart City Infrastructure Development' has moved to PAM Assessment stage.",
+      "timestamp": "2024-01-29T10:30:00Z",
+      "read": true,
+      "proposalId": "PPP-2024-001"
+    },
+    {
+      "id": 3,
+      "from": "Michael Director",
+      "to": "Sarah Manager",
+      "subject": "Renewable Energy Project - Approved for Executive Review",
+      "content": "The renewable energy project has been approved at HoD level. Please prepare executive summary for MD/CEO review.",
+      "timestamp": "2024-01-30T16:45:00Z",
+      "read": false,
+      "proposalId": "PPP-2024-003"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1,
+      "userId": 1,
+      "type": "document_request",
+      "title": "Document Request",
+      "message": "Additional financial documentation required for PPP-2024-001",
+      "timestamp": "2024-01-30T14:00:00Z",
+      "read": false,
+      "actionUrl": "/investor-dashboard?tab=messages"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "type": "proposal_escalation",
+      "title": "Proposal Ready for HoD",
+      "message": "PPP-2024-003 is ready for Head of Department review",
+      "timestamp": "2024-01-25T09:00:00Z",
+      "read": true,
+      "actionUrl": "/staff-dashboard?tab=proposals"
+    },
+    {
+      "id": 3,
+      "userId": 4,
+      "type": "executive_decision",
+      "title": "Executive Decision Required",
+      "message": "2 proposals awaiting your final decision",
+      "timestamp": "2024-01-30T08:00:00Z",
+      "read": false,
+      "actionUrl": "/executive-dashboard?tab=executive-review"
+    }
+  ],
+  "presentations": [
+    {
+      "id": 1,
+      "proposalId": "PPP-2024-005",
+      "title": "Smart Transportation Hub Presentation",
+      "investor": "Urban Mobility Inc",
+      "scheduledDate": "2024-02-05T14:00:00Z",
+      "duration": 90,
+      "location": "Executive Conference Room",
+      "attendees": ["Robert CEO", "Michael Director", "Sarah Manager"],
+      "materials": ["presentation_slides.pdf", "technical_specifications.pdf", "financial_projections.xlsx"],
+      "status": "scheduled"
+    }
+  ],
+  "systemSettings": {
+    "documentTypes": [
+      {
+        "code": "ic",
+        "name": "Investment Certificate",
+        "required": true,
+        "maxSize": "10MB",
+        "allowedFormats": ["pdf", "doc", "docx"]
+      },
+      {
+        "code": "nda",
+        "name": "Non-Disclosure Agreement",
+        "required": true,
+        "maxSize": "10MB",
+        "allowedFormats": ["pdf", "doc", "docx"]
+      },
+      {
+        "code": "businessPlan",
+        "name": "Business Plan",
+        "required": true,
+        "maxSize": "25MB",
+        "allowedFormats": ["pdf", "doc", "docx"]
+      },
+      {
+        "code": "pam",
+        "name": "Project Assessment Memorandum",
+        "required": false,
+        "maxSize": "15MB",
+        "allowedFormats": ["pdf", "doc", "docx"]
+      },
+      {
+        "code": "pmc",
+        "name": "Project Management Capability",
+        "required": false,
+        "maxSize": "15MB",
+        "allowedFormats": ["pdf", "doc", "docx"]
+      }
+    ],
+    "proposalStages": [
+      "IC Submission",
+      "NDA Signed",
+      "Business Plan Review",
+      "PAM Assessment",
+      "PMC Evaluation",
+      "HoD Review",
+      "Executive Decision",
+      "Final Approval"
+    ],
+    "categories": ["infrastructure", "healthcare", "education", "technology", "energy", "transportation"]
+  }
+}
