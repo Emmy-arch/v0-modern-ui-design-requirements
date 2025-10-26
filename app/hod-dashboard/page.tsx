@@ -15,6 +15,9 @@ import {
   TrendingUp,
   Clock,
   Users,
+  Download,
+  RefreshCw,
+  X,
 } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 
@@ -36,10 +39,8 @@ const businessProposals = [
     pppMemberNotes:
       "Strong financial backing and comprehensive business plan. All documentation complete. Recommend for approval.",
     documents: {
-      businessProposal: true,
-      financialProjections: true,
-      technicalSpecs: true,
-      riskAnalysis: true,
+      memo: "memo-001.pdf",
+      tripes: "tripes-001.pdf",
     },
   },
   {
@@ -59,10 +60,8 @@ const businessProposals = [
     pppMemberNotes:
       "Good proposal but financial projections need more detail for years 3-5. Technical approach is sound but requires validation.",
     documents: {
-      businessProposal: true,
-      financialProjections: false,
-      technicalSpecs: true,
-      riskAnalysis: true,
+      memo: "memo-002.pdf",
+      tripes: "tripes-002.pdf",
     },
   },
 ]
@@ -71,15 +70,18 @@ export default function HoDDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
   const [proposals, setProposals] = useState(businessProposals)
   const [selectedProposal, setSelectedProposal] = useState(null)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [showRefurbishmentModal, setShowRefurbishmentModal] = useState(false)
+  const [refurbishmentReason, setRefurbishmentReason] = useState("")
 
   const navigation = [
     { name: "Overview", id: "overview", icon: TrendingUp },
     { name: "Business Proposals", id: "proposals", icon: FileText },
-    { name: "Review & Decision", id: "review", icon: CheckCircle },
+    { name: "Refurbishment Requests", id: "refurbishment", icon: RefreshCw },
     { name: "Messages", id: "messages", icon: MessageSquare },
   ]
 
-  const handleProposalDecision = (proposalId: string, decision: string, comments: string) => {
+  const handleProposalDecision = (proposalId, decision, reason = "") => {
     setProposals((prev) =>
       prev.map((proposal) =>
         proposal.id === proposalId
@@ -87,17 +89,21 @@ export default function HoDDashboard() {
               ...proposal,
               status:
                 decision === "approve"
-                  ? "Approved - PMC Required"
+                  ? "Approved - Forwarded to MD/CEO"
                   : decision === "decline"
                     ? "Declined"
-                    : "Refurbishment Required",
+                    : "Refurbishment Requested",
               hodDecision: decision,
-              hodComments: comments,
+              hodReason: reason,
               decisionDate: new Date().toISOString().split("T")[0],
             }
           : proposal,
       ),
     )
+    setShowDetailsModal(false)
+    setShowRefurbishmentModal(false)
+    setSelectedProposal(null)
+    setRefurbishmentReason("")
   }
 
   const renderContent = () => {
@@ -106,11 +112,11 @@ export default function HoDDashboard() {
         return (
           <div className="space-y-6">
             {/* Welcome Section */}
-            <div className="bg-gradient-to-r from-blue-800 to-blue-600 rounded-xl p-6 text-white">
+            <div className="bg-gradient-to-r from-purple-800 to-purple-600 rounded-xl p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-bold mb-2">Head of Department Dashboard</h1>
-                  <p className="text-blue-100">Review business proposals and make approval decisions</p>
+                  <p className="text-purple-100">Review and approve business proposals from PPP members</p>
                 </div>
                 <div className="hidden md:block">
                   <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
@@ -240,26 +246,17 @@ export default function HoDDashboard() {
                           </div>
                         </div>
 
-                        <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                          <p className="text-sm font-medium text-gray-700 mb-1">PPP Member Notes:</p>
-                          <p className="text-sm text-gray-600">{proposal.pppMemberNotes}</p>
-                        </div>
-
                         <div className="flex space-x-2">
                           <Button
                             size="sm"
                             className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
                             onClick={() => {
                               setSelectedProposal(proposal)
-                              setActiveTab("review")
+                              setShowDetailsModal(true)
                             }}
                           >
                             <Eye className="w-4 h-4 mr-2" />
-                            Review Proposal
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <FileText className="w-4 h-4 mr-2" />
-                            View Documents
+                            View Details
                           </Button>
                         </div>
                       </div>
@@ -273,30 +270,28 @@ export default function HoDDashboard() {
       case "proposals":
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">Business Proposals</h1>
-                <p className="text-gray-600">All proposals forwarded from PPP members</p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">All Business Proposals</h1>
+              <p className="text-gray-600">Complete list of proposals forwarded from PPP members</p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               {proposals.map((proposal) => (
                 <Card key={proposal.id} className="shadow-lg border-0">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
                       <div>
-                        <CardTitle className="text-xl">{proposal.projectTitle}</CardTitle>
-                        <CardDescription>
+                        <h3 className="font-semibold text-lg text-gray-800">{proposal.projectTitle}</h3>
+                        <p className="text-sm text-gray-600">
                           {proposal.investorName} • {proposal.projectId}
-                        </CardDescription>
+                        </p>
                       </div>
                       <Badge
                         variant="secondary"
                         className={
                           proposal.status === "Awaiting HoD Review"
                             ? "bg-yellow-100 text-yellow-800"
-                            : proposal.status === "Approved - PMC Required"
+                            : proposal.status === "Approved - Forwarded to MD/CEO"
                               ? "bg-green-100 text-green-800"
                               : proposal.status === "Declined"
                                 ? "bg-red-100 text-red-800"
@@ -306,10 +301,8 @@ export default function HoDDashboard() {
                         {proposal.status}
                       </Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Project Overview */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                       <div className="text-center p-4 bg-blue-50 rounded-lg">
                         <div className="text-xl font-bold text-blue-800">{proposal.investmentAmount}</div>
                         <div className="text-sm text-blue-600">Investment</div>
@@ -338,46 +331,16 @@ export default function HoDDashboard() {
                       </div>
                     </div>
 
-                    {/* PPP Member Assessment */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-800 mb-2">PPP Member Assessment</h4>
-                      <p className="text-gray-600">{proposal.pppMemberNotes}</p>
-                    </div>
-
-                    {/* Document Status */}
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-3">Document Completeness</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {Object.entries(proposal.documents).map(([doc, status]) => (
-                          <div
-                            key={doc}
-                            className={`p-3 rounded-lg text-center ${
-                              status ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            <div className="font-medium capitalize">{doc.replace(/([A-Z])/g, " $1").trim()}</div>
-                            <div className="text-sm">{status ? "Complete" : "Missing"}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-3 pt-4 border-t">
-                      <Button
-                        className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
-                        onClick={() => {
-                          setSelectedProposal(proposal)
-                          setActiveTab("review")
-                        }}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Review Details
-                      </Button>
-                      <Button variant="outline">
-                        <FileText className="w-4 h-4 mr-2" />
-                        View Documents
-                      </Button>
-                    </div>
+                    <Button
+                      className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+                      onClick={() => {
+                        setSelectedProposal(proposal)
+                        setShowDetailsModal(true)
+                      }}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Details
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -385,132 +348,70 @@ export default function HoDDashboard() {
           </div>
         )
 
-      case "review":
-        const reviewProposal = selectedProposal || proposals[0]
+      case "refurbishment":
         return (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">Review & Decision</h1>
-                <p className="text-gray-600">Make your decision on the business proposal</p>
-              </div>
-              <Button variant="outline" onClick={() => setActiveTab("proposals")}>
-                Back to Proposals
-              </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Refurbishment Requests</h1>
+              <p className="text-gray-600">Manage all refurbishment requests</p>
             </div>
 
-            <Card className="shadow-lg border-0">
-              <CardHeader>
-                <CardTitle className="text-xl">{reviewProposal.projectTitle}</CardTitle>
-                <CardDescription>
-                  {reviewProposal.investorName} • {reviewProposal.projectId}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-xl font-bold text-blue-800">{reviewProposal.investmentAmount}</div>
-                    <div className="text-sm text-blue-600">Investment Amount</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-xl font-bold text-green-800">{reviewProposal.expectedROI}</div>
-                    <div className="text-sm text-green-600">Expected ROI</div>
-                  </div>
-                  <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                    <div className="text-xl font-bold text-yellow-800">{reviewProposal.projectDuration}</div>
-                    <div className="text-sm text-yellow-600">Project Duration</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <div
-                      className={`text-xl font-bold ${
-                        reviewProposal.riskAssessment === "High"
-                          ? "text-red-800"
-                          : reviewProposal.riskAssessment === "Medium"
-                            ? "text-yellow-800"
-                            : "text-green-800"
-                      }`}
-                    >
-                      {reviewProposal.riskAssessment}
+            {proposals
+              .filter((p) => p.status === "Refurbishment Requested")
+              .map((proposal) => (
+                <Card key={proposal.id} className="shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-800">{proposal.projectTitle}</h3>
+                        <p className="text-sm text-gray-600">
+                          {proposal.investorName} • {proposal.projectId}
+                        </p>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800">Refurbishment Requested</Badge>
                     </div>
-                    <div className="text-sm text-gray-600">Risk Assessment</div>
-                  </div>
-                </div>
 
-                {/* PPP Member Assessment */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">PPP Member Assessment</h4>
-                  <p className="text-gray-600 mb-4">{reviewProposal.pppMemberNotes}</p>
-                  <div className="flex items-center space-x-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">Forwarded by:</span>
-                      <span className="font-medium ml-1">PPP Member</span>
+                    <div className="bg-yellow-50 rounded-lg p-4 mb-6">
+                      <h4 className="font-semibold text-yellow-800 mb-2">Refurbishment Reason</h4>
+                      <p className="text-yellow-700">{proposal.hodReason}</p>
                     </div>
-                    <div>
-                      <span className="text-gray-600">Date:</span>
-                      <span className="font-medium ml-1">{reviewProposal.forwardedDate}</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* HoD Decision Form */}
-                <div className="border-t pt-6">
-                  <h4 className="font-semibold text-gray-800 mb-4">Your Decision</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Decision</label>
-                      <div className="space-y-2">
-                        <label className="flex items-center space-x-3">
-                          <input type="radio" name="decision" value="approve" className="text-green-600" />
-                          <span className="text-green-700 font-medium">Approve - Notify PPP Member to Prepare PMC</span>
-                        </label>
-                        <label className="flex items-center space-x-3">
-                          <input type="radio" name="decision" value="refurbishment" className="text-yellow-600" />
-                          <span className="text-yellow-700 font-medium">Request Refurbishment</span>
-                        </label>
-                        <label className="flex items-center space-x-3">
-                          <input type="radio" name="decision" value="decline" className="text-red-600" />
-                          <span className="text-red-700 font-medium">Decline Proposal</span>
-                        </label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-sm text-blue-600 mb-1">Investment Amount</p>
+                        <p className="font-semibold text-blue-800">{proposal.investmentAmount}</p>
+                      </div>
+                      <div className="bg-green-50 p-4 rounded-lg">
+                        <p className="text-sm text-green-600 mb-1">Expected ROI</p>
+                        <p className="font-semibold text-green-800">{proposal.expectedROI}</p>
+                      </div>
+                      <div className="bg-purple-50 p-4 rounded-lg">
+                        <p className="text-sm text-purple-600 mb-1">Decision Date</p>
+                        <p className="font-semibold text-purple-800">{proposal.decisionDate}</p>
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Comments</label>
-                      <Textarea
-                        placeholder="Provide your detailed assessment and reasoning for the decision..."
-                        rows={4}
-                        className="w-full"
-                      />
+                    <div className="flex space-x-3">
+                      <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Approved Refurbishment
+                      </Button>
+                      <Button variant="outline" className="flex-1 bg-transparent">
+                        <Eye className="w-4 h-4 mr-2" />
+                        Request More Info
+                      </Button>
                     </div>
+                  </CardContent>
+                </Card>
+              ))}
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Instructions for PPP Member (if applicable)
-                      </label>
-                      <Textarea
-                        placeholder="Specific instructions for next steps or required changes..."
-                        rows={3}
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-                  <Button className="bg-green-600 hover:bg-green-700 text-white">
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Submit Decision
-                  </Button>
-                  <Button variant="outline">Save as Draft</Button>
-                  <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 bg-transparent">
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Decline
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {proposals.filter((p) => p.status === "Refurbishment Requested").length === 0 && (
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-12 text-center">
+                  <p className="text-gray-600">No refurbishment requests at this time</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )
 
@@ -524,14 +425,180 @@ export default function HoDDashboard() {
   }
 
   return (
-    <DashboardLayout
-      userRole="hod"
-      userName="Michael Director"
-      navigation={navigation}
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-    >
-      {renderContent()}
-    </DashboardLayout>
+    <>
+      <DashboardLayout
+        userRole="hod"
+        userName="Michael Director"
+        navigation={navigation}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      >
+        {renderContent()}
+      </DashboardLayout>
+
+      {/* Proposal Details Modal */}
+      {showDetailsModal && selectedProposal && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader className="flex items-center justify-between">
+              <div>
+                <CardTitle>{selectedProposal.projectTitle}</CardTitle>
+                <CardDescription>
+                  {selectedProposal.investorName} • {selectedProposal.projectId}
+                </CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setShowDetailsModal(false)}>
+                <X className="w-4 h-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-xl font-bold text-blue-800">{selectedProposal.investmentAmount}</div>
+                  <div className="text-sm text-blue-600">Investment</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-xl font-bold text-green-800">{selectedProposal.expectedROI}</div>
+                  <div className="text-sm text-green-600">Expected ROI</div>
+                </div>
+                <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                  <div className="text-xl font-bold text-yellow-800">{selectedProposal.projectDuration}</div>
+                  <div className="text-sm text-yellow-600">Duration</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div
+                    className={`text-xl font-bold ${
+                      selectedProposal.riskAssessment === "High"
+                        ? "text-red-800"
+                        : selectedProposal.riskAssessment === "Medium"
+                          ? "text-yellow-800"
+                          : "text-green-800"
+                    }`}
+                  >
+                    {selectedProposal.riskAssessment}
+                  </div>
+                  <div className="text-sm text-gray-600">Risk Level</div>
+                </div>
+              </div>
+
+              {/* PPP Member Assessment */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-800 mb-2">PPP Member Assessment</h4>
+                <p className="text-gray-600">{selectedProposal.pppMemberNotes}</p>
+              </div>
+
+              {/* Documents */}
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-4">Documents for Download</h4>
+                <div className="space-y-3">
+                  {Object.entries(selectedProposal.documents).map(([docType, fileName]) => (
+                    <div key={docType} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-blue-600" />
+                        <div>
+                          <p className="font-medium text-gray-800 uppercase">{docType} Document</p>
+                          <p className="text-sm text-gray-600">{fileName}</p>
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline">
+                        <Download className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Decision Buttons */}
+              {selectedProposal.status === "Awaiting HoD Review" && (
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                  <Button
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => handleProposalDecision(selectedProposal.id, "approve")}
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Approve
+                  </Button>
+                  <Button
+                    className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white"
+                    onClick={() => {
+                      setShowDetailsModal(false)
+                      setShowRefurbishmentModal(true)
+                    }}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Refurbishment
+                  </Button>
+                  <Button
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                    onClick={() => handleProposalDecision(selectedProposal.id, "decline")}
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Reject
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Refurbishment Modal */}
+      {showRefurbishmentModal && selectedProposal && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="flex items-center justify-between">
+              <CardTitle>Request Refurbishment</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowRefurbishmentModal(false)
+                  setShowDetailsModal(true)
+                }}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="font-medium text-gray-800 mb-2">Proposal</p>
+                <p className="text-gray-600">{selectedProposal.projectTitle}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Refurbishment Reason</label>
+                <Textarea
+                  placeholder="Explain the specific areas that need refurbishment..."
+                  rows={4}
+                  value={refurbishmentReason}
+                  onChange={(e) => setRefurbishmentReason(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t">
+                <Button
+                  className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white"
+                  onClick={() => handleProposalDecision(selectedProposal.id, "refurbishment", refurbishmentReason)}
+                >
+                  Send Refurbishment Request
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowRefurbishmentModal(false)
+                    setShowDetailsModal(true)
+                    setRefurbishmentReason("")
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </>
   )
 }

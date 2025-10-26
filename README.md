@@ -1,4 +1,4 @@
-# IPMS UI Design
+# Hospital UI Design
 
 *Automatically synced with your [v0.dev](https://v0.dev) deployments*
 
