@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Heart,
   Download,
@@ -18,12 +20,15 @@ import {
   ChevronRight,
   X,
   Check,
+  CheckCircle,
+  AlertTriangle,
+  Send,
   Calendar,
-} from "lucide-react"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { ProjectCard } from "@/components/project-card"
-import { StatusTimeline } from "@/components/status-timeline"
-import { FileUploadZone } from "@/components/file-upload-zone"
+} from "lucide-react";
+import { DashboardLayout } from "@/components/dashboard-layout";
+import { ProjectCard } from "@/components/project-card";
+import { StatusTimeline } from "@/components/status-timeline";
+import { FileUploadZone } from "@/components/file-upload-zone";
 
 const availableProjects = [
   {
@@ -41,8 +46,13 @@ const availableProjects = [
     riskLevel: "Medium",
     deadline: "2024-03-15",
     status: "Open for Interest",
-    image: "/placeholder.svg?height=200&width=400&text=Smart+City+Infrastructure",
-    highlights: ["Government backing", "Proven technology", "Long-term contract"],
+    image:
+      "/placeholder.svg?height=200&width=400&text=Smart+City+Infrastructure",
+    highlights: [
+      "Government backing",
+      "Proven technology",
+      "Long-term contract",
+    ],
     keyFeatures: [
       "IoT sensor network across the city",
       "Integrated traffic management system",
@@ -87,7 +97,11 @@ const availableProjects = [
     deadline: "2024-04-01",
     status: "Open for Interest",
     image: "/placeholder.svg?height=200&width=400&text=Renewable+Energy+Grid",
-    highlights: ["Green energy focus", "Government incentives", "Stable returns"],
+    highlights: [
+      "Green energy focus",
+      "Government incentives",
+      "Stable returns",
+    ],
     keyFeatures: [
       "2000MW solar farm installation",
       "500MW wind turbine network",
@@ -131,7 +145,8 @@ const availableProjects = [
     riskLevel: "High",
     deadline: "2024-02-28",
     status: "Open for Interest",
-    image: "/placeholder.svg?height=200&width=400&text=Digital+Healthcare+Platform",
+    image:
+      "/placeholder.svg?height=200&width=400&text=Digital+Healthcare+Platform",
     highlights: ["High growth potential", "Tech innovation", "Social impact"],
     keyFeatures: [
       "Telemedicine consultation platform",
@@ -177,7 +192,11 @@ const availableProjects = [
     deadline: "2024-05-15",
     status: "Open for Interest",
     image: "/placeholder.svg?height=200&width=400&text=Educational+Technology",
-    highlights: ["AI-powered learning", "Scalable platform", "Future-ready education"],
+    highlights: [
+      "AI-powered learning",
+      "Scalable platform",
+      "Future-ready education",
+    ],
     keyFeatures: [
       "Virtual classroom environments",
       "AI-powered personalized learning",
@@ -222,7 +241,11 @@ const availableProjects = [
     deadline: "2024-06-30",
     status: "Open for Interest",
     image: "/placeholder.svg?height=200&width=400&text=Smart+Transportation",
-    highlights: ["Autonomous vehicle ready", "Smart infrastructure", "Traffic optimization"],
+    highlights: [
+      "Autonomous vehicle ready",
+      "Smart infrastructure",
+      "Traffic optimization",
+    ],
     keyFeatures: [
       "V2X communication systems",
       "Smart sensor networks",
@@ -267,7 +290,11 @@ const availableProjects = [
     deadline: "2024-07-20",
     status: "Open for Interest",
     image: "/placeholder.svg?height=200&width=400&text=Water+Management",
-    highlights: ["Water conservation", "IoT monitoring", "Predictive maintenance"],
+    highlights: [
+      "Water conservation",
+      "IoT monitoring",
+      "Predictive maintenance",
+    ],
     keyFeatures: [
       "Smart water distribution network",
       "Advanced treatment facilities",
@@ -296,7 +323,7 @@ const availableProjects = [
     },
     isInterested: false,
   },
-]
+];
 
 const myInterests = [
   {
@@ -350,43 +377,102 @@ const myInterests = [
       mou: { status: "pending", date: null },
     },
   },
-]
+];
 
 const downloadFile = (filename: string, content: string) => {
-  const element = document.createElement("a")
-  const file = new Blob([content], { type: "text/plain" })
-  element.href = URL.createObjectURL(file)
-  element.download = filename
-  document.body.appendChild(element)
-  element.click()
-  document.body.removeChild(element)
-}
+  const element = document.createElement("a");
+  const file = new Blob([content], { type: "text/plain" });
+  element.href = URL.createObjectURL(file);
+  element.download = filename;
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+};
+
+const refurbishmentRequests = [
+  {
+    id: "REF-001",
+    projectId: "PPP-PROJ-003",
+    projectTitle: "Digital Healthcare Platform",
+    interestId: "INT-003",
+    investorName: "Tech Ventures Ltd",
+    hodComment:
+      "The financial projections need to be more detailed. Please request updated cash flow analysis for years 3-5 and clarify the CAPEX breakdown.",
+    pppMemberComment: null,
+    requiredDocuments: [],
+    requestDate: "2024-01-25",
+    status: "pending_response",
+    hodName: "Dr. Michael Chen",
+  },
+  {
+    id: "REF-002",
+    projectId: "PPP-PROJ-001",
+    projectTitle: "Smart City Infrastructure Development",
+    interestId: "INT-002",
+    investorName: "Sarah Johnson",
+    hodComment:
+      "Risk assessment needs to be comprehensive. Include market risk, regulatory risk, and operational risk analysis.",
+    pppMemberComment:
+      "We have added notes on market conditions. Awaiting investor response on regulatory documentation.",
+    requiredDocuments: [
+      "Updated_Risk_Assessment.pdf",
+      "Regulatory_Compliance_Report.pdf",
+    ],
+    requestDate: "2024-01-20",
+    status: "awaiting_investor",
+    hodName: "Dr. Michael Chen",
+  },
+];
 
 export default function InvestorDashboard() {
-  const [activeTab, setActiveTab] = useState("projects")
-  const [projects, setProjects] = useState(availableProjects)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedProject, setSelectedProject] = useState(null)
-  const [showInterestModal, setShowInterestModal] = useState(false)
-  const [pendingInterestProject, setPendingInterestProject] = useState(null)
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false)
-  const [interestsPage, setInterestsPage] = useState(1)
-  const [selectedInterest, setSelectedInterest] = useState(null)
-  const interestsPerPage = 3
+  const [activeTab, setActiveTab] = useState("projects");
+  const [projects, setProjects] = useState(availableProjects);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [pendingInterestProject, setPendingInterestProject] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [interestsPage, setInterestsPage] = useState(1);
+  const [selectedInterest, setSelectedInterest] = useState(null);
+  const [selectedRefurbishment, setSelectedRefurbishment] = useState<
+    string | null
+  >(null);
+  const [refurbishments, setRefurbishments] = useState(refurbishmentRequests);
+  const [refurbPppComment, setRefurbPppComment] = useState("");
+  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
+  const interestsPerPage = 3;
 
-  const projectsPerPage = 6
+  const projectsPerPage = 6;
 
   const navigation = [
     { name: "Available Projects", id: "projects", icon: TrendingUp },
     { name: "My Interests", id: "interests", icon: Heart },
     { name: "Documents", id: "documents", icon: FileText },
+    { name: "Query", id: "hod-requests", icon: AlertTriangle },
     { name: "Settings", id: "settings", icon: User },
-  ]
+  ];
+
+  const availableDocuments = [
+    {
+      id: "doc-1",
+      name: "Updated Financial Projections",
+      label: "Updated_Financial_Projections.pdf",
+    },
+    { id: "doc-2", name: "CAPEX Breakdown", label: "CAPEX_Breakdown.pdf" },
+    { id: "doc-3", name: "Risk Assessment", label: "Risk_Assessment.pdf" },
+    { id: "doc-4", name: "Market Analysis", label: "Market_Analysis.pdf" },
+    {
+      id: "doc-5",
+      name: "Regulatory Compliance Report",
+      label: "Regulatory_Compliance_Report.pdf",
+    },
+    { id: "doc-6", name: "Operational Plan", label: "Operational_Plan.pdf" },
+  ];
 
   const handleDownload = (documentType: string, projectTitle: string) => {
-    let content = ""
-    let filename = ""
+    let content = "";
+    let filename = "";
 
     switch (documentType) {
       case "ic":
@@ -398,9 +484,9 @@ Date: ${new Date().toLocaleDateString()}
 This is a template for the Investment Certificate document.
 Please fill in all required fields and sign before uploading.
 
-[Template content would be here...]`
-        filename = `IC_Template_${projectTitle.replace(/\s+/g, "_")}.txt`
-        break
+[Template content would be here...]`;
+        filename = `IC_Template_${projectTitle.replace(/\s+/g, "_")}.txt`;
+        break;
       case "nda":
         content = `NON-DISCLOSURE AGREEMENT TEMPLATE
         
@@ -410,9 +496,9 @@ Date: ${new Date().toLocaleDateString()}
 This is a template for the Non-Disclosure Agreement document.
 Please review, fill in required information, and sign before uploading.
 
-[NDA template content would be here...]`
-        filename = `NDA_Template_${projectTitle.replace(/\s+/g, "_")}.txt`
-        break
+[NDA template content would be here...]`;
+        filename = `NDA_Template_${projectTitle.replace(/\s+/g, "_")}.txt`;
+        break;
       case "project-plan":
         content = `PROJECT PLAN TEMPLATE
         
@@ -422,9 +508,12 @@ Date: ${new Date().toLocaleDateString()}
 This is a template for the Project Plan document.
 Please provide detailed project implementation strategy.
 
-[Project plan template content would be here...]`
-        filename = `Project_Plan_Template_${projectTitle.replace(/\s+/g, "_")}.txt`
-        break
+[Project plan template content would be here...]`;
+        filename = `Project_Plan_Template_${projectTitle.replace(
+          /\s+/g,
+          "_"
+        )}.txt`;
+        break;
       case "kyc":
         content = `KYC FORM TEMPLATE
         
@@ -434,9 +523,9 @@ Date: ${new Date().toLocaleDateString()}
 Know Your Customer (KYC) Form
 Please provide all required documentation and information.
 
-[KYC form template content would be here...]`
-        filename = `KYC_Form_${projectTitle.replace(/\s+/g, "_")}.txt`
-        break
+[KYC form template content would be here...]`;
+        filename = `KYC_Form_${projectTitle.replace(/\s+/g, "_")}.txt`;
+        break;
       case "brochure":
         content = `PROJECT BROCHURE
         
@@ -445,16 +534,65 @@ Date: ${new Date().toLocaleDateString()}
 
 Comprehensive project information and investment details.
 
-[Project brochure content would be here...]`
-        filename = `${projectTitle.replace(/\s+/g, "_")}_Brochure.txt`
-        break
+[Project brochure content would be here...]`;
+        filename = `${projectTitle.replace(/\s+/g, "_")}_Brochure.txt`;
+        break;
       default:
-        content = "Document content"
-        filename = "document.txt"
+        content = "Document content";
+        filename = "document.txt";
     }
 
-    downloadFile(filename, content)
-  }
+    downloadFile(filename, content);
+  };
+
+  const handleSendRefurbishment = (refurbId: string) => {
+    if (!refurbPppComment || selectedDocuments.length === 0) {
+      alert("Please add comments and select at least one document");
+      return;
+    }
+
+    setRefurbishments((prev) =>
+      prev.map((refurb) => {
+        if (refurb.id === refurbId) {
+          return {
+            ...refurb,
+            pppMemberComment: refurbPppComment,
+            requiredDocuments: selectedDocuments.map(
+              (docId) =>
+                availableDocuments.find((d) => d.id === docId)?.label || ""
+            ),
+            status: "awaiting_investor",
+          };
+        }
+        return refurb;
+      })
+    );
+
+    setSelectedRefurbishment(null);
+    setRefurbPppComment("");
+    setSelectedDocuments([]);
+  };
+
+  const handleCloseRefurbishment = (refurbId: string) => {
+    setRefurbishments((prev) =>
+      prev.map((refurb) => {
+        if (refurb.id === refurbId) {
+          return { ...refurb, status: "closed" };
+        }
+        return refurb;
+      })
+    );
+
+    setSelectedRefurbishment(null);
+    setRefurbPppComment("");
+    setSelectedDocuments([]);
+  };
+
+  const toggleDocumentSelection = (docId: string) => {
+    setSelectedDocuments((prev) =>
+      prev.includes(docId) ? prev.filter((d) => d !== docId) : [...prev, docId]
+    );
+  };
 
   // Filter projects based on search term
   const filteredProjects = projects.filter(
@@ -462,42 +600,44 @@ Comprehensive project information and investment details.
       project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.sector.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.location.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      project.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage)
-  const startIndex = (currentPage - 1) * projectsPerPage
-  const endIndex = startIndex + projectsPerPage
-  const currentProjects = filteredProjects.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+  const startIndex = (currentPage - 1) * projectsPerPage;
+  const endIndex = startIndex + projectsPerPage;
+  const currentProjects = filteredProjects.slice(startIndex, endIndex);
 
   const handleInterest = (projectId: string) => {
-    const project = projects.find((p) => p.id === projectId)
-    setPendingInterestProject(project)
-    setShowInterestModal(true)
-  }
+    const project = projects.find((p) => p.id === projectId);
+    setPendingInterestProject(project);
+    setShowInterestModal(true);
+  };
 
   const confirmInterest = () => {
     if (pendingInterestProject) {
       setProjects((prev) =>
         prev.map((project) =>
-          project.id === pendingInterestProject.id ? { ...project, isInterested: !project.isInterested } : project,
-        ),
-      )
-      setShowInterestModal(false)
-      setPendingInterestProject(null)
-      setShowSuccessAlert(true)
-      setTimeout(() => setShowSuccessAlert(false), 3000)
+          project.id === pendingInterestProject.id
+            ? { ...project, isInterested: !project.isInterested }
+            : project
+        )
+      );
+      setShowInterestModal(false);
+      setPendingInterestProject(null);
+      setShowSuccessAlert(true);
+      setTimeout(() => setShowSuccessAlert(false), 3000);
     }
-  }
+  };
 
   const handleViewProject = (project) => {
-    setSelectedProject(project)
-  }
+    setSelectedProject(project);
+  };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -507,7 +647,11 @@ Comprehensive project information and investment details.
             <div className="space-y-6">
               {/* Back Button */}
               <div className="flex items-center space-x-4">
-                <Button variant="outline" onClick={() => setSelectedProject(null)} className="bg-transparent">
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedProject(null)}
+                  className="bg-transparent"
+                >
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Back to Projects
                 </Button>
@@ -531,8 +675,8 @@ Comprehensive project information and investment details.
                             selectedProject.riskLevel === "Low"
                               ? "bg-green-100 text-green-800"
                               : selectedProject.riskLevel === "Medium"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-red-100 text-red-800"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
                           }
                         >
                           {selectedProject.riskLevel} Risk
@@ -542,7 +686,9 @@ Comprehensive project information and investment details.
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="text-2xl mb-2">{selectedProject.title}</CardTitle>
+                          <CardTitle className="text-2xl mb-2">
+                            {selectedProject.title}
+                          </CardTitle>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
                             <span>{selectedProject.sector}</span>
                             <span>•</span>
@@ -555,15 +701,24 @@ Comprehensive project information and investment details.
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div>
-                        <h3 className="font-semibold text-gray-800 mb-3">Project Overview</h3>
-                        <p className="text-gray-600 leading-relaxed">{selectedProject.fullDescription}</p>
+                        <h3 className="font-semibold text-gray-800 mb-3">
+                          Project Overview
+                        </h3>
+                        <p className="text-gray-600 leading-relaxed">
+                          {selectedProject.fullDescription}
+                        </p>
                       </div>
 
                       <div>
-                        <h3 className="font-semibold text-gray-800 mb-3">Key Features</h3>
+                        <h3 className="font-semibold text-gray-800 mb-3">
+                          Key Features
+                        </h3>
                         <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {selectedProject.keyFeatures.map((feature, index) => (
-                            <li key={index} className="flex items-center space-x-2">
+                            <li
+                              key={index}
+                              className="flex items-center space-x-2"
+                            >
                               <Check className="w-4 h-4 text-green-600" />
                               <span className="text-gray-600">{feature}</span>
                             </li>
@@ -572,37 +727,54 @@ Comprehensive project information and investment details.
                       </div>
 
                       <div>
-                        <h3 className="font-semibold text-gray-800 mb-3">Technical Requirements</h3>
+                        <h3 className="font-semibold text-gray-800 mb-3">
+                          Technical Requirements
+                        </h3>
                         <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {selectedProject.technicalRequirements.map((requirement, index) => (
-                            <li key={index} className="flex items-center space-x-2">
-                              <Check className="w-4 h-4 text-blue-600" />
-                              <span className="text-gray-600">{requirement}</span>
-                            </li>
-                          ))}
+                          {selectedProject.technicalRequirements.map(
+                            (requirement, index) => (
+                              <li
+                                key={index}
+                                className="flex items-center space-x-2"
+                              >
+                                <Check className="w-4 h-4 text-blue-600" />
+                                <span className="text-gray-600">
+                                  {requirement}
+                                </span>
+                              </li>
+                            )
+                          )}
                         </ul>
                       </div>
 
                       <div>
-                        <h3 className="font-semibold text-gray-800 mb-3">Financial Projections</h3>
+                        <h3 className="font-semibold text-gray-800 mb-3">
+                          Financial Projections
+                        </h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           <div className="bg-blue-50 rounded-lg p-4 text-center">
                             <div className="text-lg font-bold text-blue-800">
                               {selectedProject.financialProjections.year1}
                             </div>
-                            <div className="text-sm text-blue-600">Year 1 Revenue</div>
+                            <div className="text-sm text-blue-600">
+                              Year 1 Revenue
+                            </div>
                           </div>
                           <div className="bg-green-50 rounded-lg p-4 text-center">
                             <div className="text-lg font-bold text-green-800">
                               {selectedProject.financialProjections.year2}
                             </div>
-                            <div className="text-sm text-green-600">Year 2 Revenue</div>
+                            <div className="text-sm text-green-600">
+                              Year 2 Revenue
+                            </div>
                           </div>
                           <div className="bg-yellow-50 rounded-lg p-4 text-center">
                             <div className="text-lg font-bold text-yellow-800">
                               {selectedProject.financialProjections.breakEven}
                             </div>
-                            <div className="text-sm text-yellow-600">Break Even</div>
+                            <div className="text-sm text-yellow-600">
+                              Break Even
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -620,16 +792,24 @@ Comprehensive project information and investment details.
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Investment Range</span>
-                          <span className="font-medium">{selectedProject.investmentRange}</span>
+                          <span className="text-gray-600">
+                            Investment Range
+                          </span>
+                          <span className="font-medium">
+                            {selectedProject.investmentRange}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Expected ROI</span>
-                          <span className="font-medium">{selectedProject.expectedROI}</span>
+                          <span className="font-medium">
+                            {selectedProject.expectedROI}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Duration</span>
-                          <span className="font-medium">{selectedProject.duration}</span>
+                          <span className="font-medium">
+                            {selectedProject.duration}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Risk Level</span>
@@ -638,8 +818,8 @@ Comprehensive project information and investment details.
                               selectedProject.riskLevel === "Low"
                                 ? "text-green-600"
                                 : selectedProject.riskLevel === "Medium"
-                                  ? "text-yellow-600"
-                                  : "text-red-600"
+                                ? "text-yellow-600"
+                                : "text-red-600"
                             }`}
                           >
                             {selectedProject.riskLevel}
@@ -656,13 +836,21 @@ Comprehensive project information and investment details.
                           }`}
                           onClick={() => handleInterest(selectedProject.id)}
                         >
-                          <Heart className={`w-4 h-4 mr-2 ${selectedProject.isInterested ? "fill-current" : ""}`} />
-                          {selectedProject.isInterested ? "Interest Expressed" : "I'm Interested"}
+                          <Heart
+                            className={`w-4 h-4 mr-2 ${
+                              selectedProject.isInterested ? "fill-current" : ""
+                            }`}
+                          />
+                          {selectedProject.isInterested
+                            ? "Interest Expressed"
+                            : "I'm Interested"}
                         </Button>
                         <Button
                           variant="outline"
                           className="w-full bg-transparent"
-                          onClick={() => handleDownload("brochure", selectedProject.title)}
+                          onClick={() =>
+                            handleDownload("brochure", selectedProject.title)
+                          }
                         >
                           <Download className="w-4 h-4 mr-2" />
                           Download Brochure
@@ -678,14 +866,23 @@ Comprehensive project information and investment details.
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div>
-                        <p className="font-medium text-gray-800">{selectedProject.contactInfo.projectManager}</p>
+                        <p className="font-medium text-gray-800">
+                          {selectedProject.contactInfo.projectManager}
+                        </p>
                         <p className="text-sm text-gray-600">Project Manager</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-sm text-gray-600">Email: {selectedProject.contactInfo.email}</p>
-                        <p className="text-sm text-gray-600">Phone: {selectedProject.contactInfo.phone}</p>
+                        <p className="text-sm text-gray-600">
+                          Email: {selectedProject.contactInfo.email}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Phone: {selectedProject.contactInfo.phone}
+                        </p>
                       </div>
-                      <Button variant="outline" className="w-full bg-transparent">
+                      <Button
+                        variant="outline"
+                        className="w-full bg-transparent"
+                      >
                         Contact Project Manager
                       </Button>
                     </CardContent>
@@ -699,9 +896,14 @@ Comprehensive project information and investment details.
                     <CardContent>
                       <div className="space-y-2">
                         {selectedProject.highlights.map((highlight, index) => (
-                          <div key={index} className="flex items-center space-x-2">
+                          <div
+                            key={index}
+                            className="flex items-center space-x-2"
+                          >
                             <Check className="w-4 h-4 text-green-600" />
-                            <span className="text-sm text-gray-600">{highlight}</span>
+                            <span className="text-sm text-gray-600">
+                              {highlight}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -710,7 +912,7 @@ Comprehensive project information and investment details.
                 </div>
               </div>
             </div>
-          )
+          );
         }
 
         return (
@@ -719,8 +921,13 @@ Comprehensive project information and investment details.
             <div className="bg-gradient-to-r from-blue-800 to-blue-600 rounded-xl p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-bold mb-2">Available PPP Projects</h1>
-                  <p className="text-blue-100">Explore investment opportunities in public-private partnerships</p>
+                  <h1 className="text-2xl font-bold mb-2">
+                    Available PPP Projects
+                  </h1>
+                  <p className="text-blue-100">
+                    Explore investment opportunities in public-private
+                    partnerships
+                  </p>
                 </div>
                 <div className="hidden md:block">
                   <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
@@ -739,8 +946,8 @@ Comprehensive project information and investment details.
                     placeholder="Search projects by title, description, sector, or location..."
                     value={searchTerm}
                     onChange={(e) => {
-                      setSearchTerm(e.target.value)
-                      setCurrentPage(1) // Reset to first page when searching
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1); // Reset to first page when searching
                     }}
                     className="pl-10 h-12"
                   />
@@ -766,7 +973,8 @@ Comprehensive project information and investment details.
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600">
-                      Showing {startIndex + 1}-{Math.min(endIndex, filteredProjects.length)} of{" "}
+                      Showing {startIndex + 1}-
+                      {Math.min(endIndex, filteredProjects.length)} of{" "}
                       {filteredProjects.length} projects
                     </div>
                     <div className="flex items-center space-x-2">
@@ -781,21 +989,25 @@ Comprehensive project information and investment details.
                         Previous
                       </Button>
 
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <Button
-                          key={page}
-                          variant={currentPage === page ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => handlePageChange(page)}
-                          className={
-                            currentPage === page
-                              ? "bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
-                              : "bg-transparent"
-                          }
-                        >
-                          {page}
-                        </Button>
-                      ))}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => (
+                          <Button
+                            key={page}
+                            variant={
+                              currentPage === page ? "default" : "outline"
+                            }
+                            size="sm"
+                            onClick={() => handlePageChange(page)}
+                            className={
+                              currentPage === page
+                                ? "bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+                                : "bg-transparent"
+                            }
+                          >
+                            {page}
+                          </Button>
+                        )
+                      )}
 
                       <Button
                         variant="outline"
@@ -818,16 +1030,25 @@ Comprehensive project information and investment details.
               <Card className="shadow-lg border-0">
                 <CardContent className="p-12 text-center">
                   <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">No Projects Found</h3>
-                  <p className="text-gray-600 mb-6">Try adjusting your search terms or browse all available projects</p>
-                  <Button variant="outline" onClick={() => setSearchTerm("")} className="bg-transparent">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    No Projects Found
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Try adjusting your search terms or browse all available
+                    projects
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSearchTerm("")}
+                    className="bg-transparent"
+                  >
                     Clear Search
                   </Button>
                 </CardContent>
               </Card>
             )}
           </div>
-        )
+        );
 
       case "interests":
         if (selectedInterest) {
@@ -835,7 +1056,11 @@ Comprehensive project information and investment details.
             <div className="space-y-6">
               {/* Back Button */}
               <div className="flex items-center space-x-4">
-                <Button variant="outline" onClick={() => setSelectedInterest(null)} className="bg-transparent">
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedInterest(null)}
+                  className="bg-transparent"
+                >
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Back to My Interests
                 </Button>
@@ -846,10 +1071,17 @@ Comprehensive project information and investment details.
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-2xl">{selectedInterest.title}</CardTitle>
-                      <CardDescription>Project ID: {selectedInterest.id}</CardDescription>
+                      <CardTitle className="text-2xl">
+                        {selectedInterest.title}
+                      </CardTitle>
+                      <CardDescription>
+                        Project ID: {selectedInterest.id}
+                      </CardDescription>
                     </div>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 text-blue-800"
+                    >
                       {selectedInterest.status}
                     </Badge>
                   </div>
@@ -860,10 +1092,14 @@ Comprehensive project information and investment details.
                     <div className="flex justify-between text-sm">
                       <span>Overall Progress</span>
                       <span>
-                        Stage {selectedInterest.stage} of {selectedInterest.totalStages}
+                        Stage {selectedInterest.stage} of{" "}
+                        {selectedInterest.totalStages}
                       </span>
                     </div>
-                    <Progress value={selectedInterest.progress} className="h-3" />
+                    <Progress
+                      value={selectedInterest.progress}
+                      className="h-3"
+                    />
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Last Update: {selectedInterest.lastUpdate}</span>
                       <span>{selectedInterest.nextAction}</span>
@@ -872,11 +1108,17 @@ Comprehensive project information and investment details.
 
                   {/* Detailed Stages */}
                   <div className="space-y-6">
-                    <h3 className="text-lg font-semibold text-gray-800">Application Stages</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Application Stages
+                    </h3>
 
                     {/* Stage 1: Interest Expressed */}
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 1 ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 1
+                          ? "border-green-200 bg-green-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -885,13 +1127,19 @@ Comprehensive project information and investment details.
                               selectedInterest.stage > 1
                                 ? "bg-green-500 text-white"
                                 : selectedInterest.stage === 1
-                                  ? "bg-yellow-400 text-yellow-900"
-                                  : "bg-gray-300 text-gray-600"
+                                ? "bg-yellow-400 text-yellow-900"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage > 1 ? <Check className="w-4 h-4" /> : "1"}
+                            {selectedInterest.stage > 1 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "1"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 1: Interest Expressed</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 1: Interest Expressed
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
@@ -899,39 +1147,47 @@ Comprehensive project information and investment details.
                             selectedInterest.stage > 1
                               ? "bg-green-100 text-green-800"
                               : selectedInterest.stage === 1
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-gray-100 text-gray-600"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage > 1
                             ? "Approved"
                             : selectedInterest.stage === 1
-                              ? "Pending"
-                              : "Not Started"}
+                            ? "Pending"
+                            : "Not Started"}
                         </Badge>
                       </div>
                       <p className="text-gray-600 mb-4">
-                        Your interest in this project has been registered and is being reviewed by the PPP team.
+                        Your interest in this project has been registered and is
+                        being reviewed by the PPP team.
                       </p>
                       {selectedInterest.stage === 1 && (
                         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                           <p className="text-yellow-800 text-sm">
-                            ⏳ Your interest is currently under review. You will be notified once approved.
+                            ⏳ Your interest is currently under review. You will
+                            be notified once approved.
                           </p>
                         </div>
                       )}
                       {selectedInterest.stage > 1 && (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                           <p className="text-green-800 text-sm">
-                            ✅ Interest approved. Moving to document exchange phase.
+                            ✅ Interest approved. Moving to document exchange
+                            phase.
                           </p>
                         </div>
                       )}
                     </div>
 
                     {/* Stage 2: IC/NDA Exchange */}
+
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 2 ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 2
+                          ? "border-blue-200 bg-blue-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -940,13 +1196,19 @@ Comprehensive project information and investment details.
                               selectedInterest.stage > 2
                                 ? "bg-green-500 text-white"
                                 : selectedInterest.stage === 2
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-gray-300 text-gray-600"
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage > 2 ? <Check className="w-4 h-4" /> : "2"}
+                            {selectedInterest.stage > 2 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "2"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 2: IC/NDA Exchange</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 2: IC/NDA Exchange
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
@@ -954,40 +1216,49 @@ Comprehensive project information and investment details.
                             selectedInterest.stage > 2
                               ? "bg-green-100 text-green-800"
                               : selectedInterest.stage === 2
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-600"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage > 2
                             ? "Completed"
                             : selectedInterest.stage === 2
-                              ? "In Progress"
-                              : "Pending"}
+                            ? "In Progress"
+                            : "Pending"}
                         </Badge>
                       </div>
                       <p className="text-gray-600 mb-4">
-                        Download, sign, and upload the Investment Certificate and Non-Disclosure Agreement documents.
+                        Download, sign, and upload the Investment Certificate
+                        and Non-Disclosure Agreement documents.
                       </p>
 
                       {selectedInterest.stage >= 2 && (
                         <div className="space-y-4">
                           {/* Download Section */}
                           <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h5 className="font-medium text-gray-800 mb-3">📥 Download Documents</h5>
+                            <h5 className="font-medium text-gray-800 mb-3">
+                              📥 Download Documents
+                            </h5>
                             <div className="space-y-2">
                               <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                                 <div className="flex items-center space-x-3">
                                   <FileText className="w-5 h-5 text-blue-600" />
                                   <div>
-                                    <p className="font-medium text-blue-800">Investment Certificate Template</p>
-                                    <p className="text-sm text-blue-600">IC_Template_v2.pdf</p>
+                                    <p className="font-medium text-blue-800">
+                                      Investment Certificate Template
+                                    </p>
+                                    <p className="text-sm text-blue-600">
+                                      IC_Template_v2.pdf
+                                    </p>
                                   </div>
                                 </div>
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   className="border-blue-200 bg-transparent"
-                                  onClick={() => handleDownload("ic", selectedInterest.title)}
+                                  onClick={() =>
+                                    handleDownload("ic", selectedInterest.title)
+                                  }
                                 >
                                   <Download className="w-4 h-4 mr-2" />
                                   Download
@@ -997,15 +1268,24 @@ Comprehensive project information and investment details.
                                 <div className="flex items-center space-x-3">
                                   <FileText className="w-5 h-5 text-blue-600" />
                                   <div>
-                                    <p className="font-medium text-blue-800">Non-Disclosure Agreement</p>
-                                    <p className="text-sm text-blue-600">NDA_Template_v2.pdf</p>
+                                    <p className="font-medium text-blue-800">
+                                      Non-Disclosure Agreement
+                                    </p>
+                                    <p className="text-sm text-blue-600">
+                                      NDA_Template_v2.pdf
+                                    </p>
                                   </div>
                                 </div>
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   className="border-blue-200 bg-transparent"
-                                  onClick={() => handleDownload("nda", selectedInterest.title)}
+                                  onClick={() =>
+                                    handleDownload(
+                                      "nda",
+                                      selectedInterest.title
+                                    )
+                                  }
                                 >
                                   <Download className="w-4 h-4 mr-2" />
                                   Download
@@ -1016,7 +1296,9 @@ Comprehensive project information and investment details.
 
                           {/* Upload Section */}
                           <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h5 className="font-medium text-gray-800 mb-3">📤 Upload Signed Documents</h5>
+                            <h5 className="font-medium text-gray-800 mb-3">
+                              📤 Upload Signed Documents
+                            </h5>
                             <div className="space-y-4">
                               <FileUploadZone
                                 title="Signed Investment Certificate"
@@ -1024,7 +1306,10 @@ Comprehensive project information and investment details.
                                 acceptedTypes=".pdf,.doc,.docx"
                                 maxSize="10MB"
                                 status={
-                                  selectedInterest.documents.icNda.status === "approved" ? "uploaded" : "required"
+                                  selectedInterest.documents.icNda.status ===
+                                  "approved"
+                                    ? "uploaded"
+                                    : "required"
                                 }
                               />
                               <FileUploadZone
@@ -1033,7 +1318,10 @@ Comprehensive project information and investment details.
                                 acceptedTypes=".pdf,.doc,.docx"
                                 maxSize="10MB"
                                 status={
-                                  selectedInterest.documents.icNda.status === "approved" ? "uploaded" : "required"
+                                  selectedInterest.documents.icNda.status ===
+                                  "approved"
+                                    ? "uploaded"
+                                    : "required"
                                 }
                               />
                             </div>
@@ -1044,7 +1332,11 @@ Comprehensive project information and investment details.
 
                     {/* Stage 3: Project Plan Submission */}
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 3 ? "border-purple-200 bg-purple-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 3
+                          ? "border-purple-200 bg-purple-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -1053,13 +1345,19 @@ Comprehensive project information and investment details.
                               selectedInterest.stage > 3
                                 ? "bg-green-500 text-white"
                                 : selectedInterest.stage === 3
-                                  ? "bg-purple-500 text-white"
-                                  : "bg-gray-300 text-gray-600"
+                                ? "bg-purple-500 text-white"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage > 3 ? <Check className="w-4 h-4" /> : "3"}
+                            {selectedInterest.stage > 3 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "3"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 3: Project Plan Submission</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 3: Project Plan Submission
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
@@ -1067,38 +1365,50 @@ Comprehensive project information and investment details.
                             selectedInterest.stage > 3
                               ? "bg-green-100 text-green-800"
                               : selectedInterest.stage === 3
-                                ? "bg-purple-100 text-purple-800"
-                                : "bg-gray-100 text-gray-600"
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage > 3
                             ? "Completed"
                             : selectedInterest.stage === 3
-                              ? "In Progress"
-                              : "Pending"}
+                            ? "In Progress"
+                            : "Pending"}
                         </Badge>
                       </div>
                       <p className="text-gray-600 mb-4">
-                        Download the project plan template and submit your detailed project proposal.
+                        Download the project plan template and submit your
+                        detailed project proposal.
                       </p>
 
                       {selectedInterest.stage >= 3 && (
                         <div className="space-y-4">
                           <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h5 className="font-medium text-gray-800 mb-3">📥 Download Project Plan Template</h5>
+                            <h5 className="font-medium text-gray-800 mb-3">
+                              📥 Download Project Plan Template
+                            </h5>
                             <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                               <div className="flex items-center space-x-3">
                                 <FileText className="w-5 h-5 text-purple-600" />
                                 <div>
-                                  <p className="font-medium text-purple-800">Project Plan Template</p>
-                                  <p className="text-sm text-purple-600">Project_Plan_Template_v3.pdf</p>
+                                  <p className="font-medium text-purple-800">
+                                    Project Plan Template
+                                  </p>
+                                  <p className="text-sm text-purple-600">
+                                    Project_Plan_Template_v3.pdf
+                                  </p>
                                 </div>
                               </div>
                               <Button
                                 size="sm"
                                 variant="outline"
                                 className="border-purple-200 bg-transparent"
-                                onClick={() => handleDownload("project-plan", selectedInterest.title)}
+                                onClick={() =>
+                                  handleDownload(
+                                    "project-plan",
+                                    selectedInterest.title
+                                  )
+                                }
                               >
                                 <Download className="w-4 h-4 mr-2" />
                                 Download
@@ -1107,14 +1417,19 @@ Comprehensive project information and investment details.
                           </div>
 
                           <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h5 className="font-medium text-gray-800 mb-3">📤 Upload Project Plan</h5>
+                            <h5 className="font-medium text-gray-800 mb-3">
+                              📤 Upload Project Plan
+                            </h5>
                             <FileUploadZone
                               title="Completed Project Plan"
                               description="Upload your detailed project plan document"
                               acceptedTypes=".pdf,.doc,.docx"
                               maxSize="25MB"
                               status={
-                                selectedInterest.documents.projectPlan.status === "submitted" ? "uploaded" : "required"
+                                selectedInterest.documents.projectPlan
+                                  .status === "submitted"
+                                  ? "uploaded"
+                                  : "required"
                               }
                             />
                           </div>
@@ -1124,7 +1439,11 @@ Comprehensive project information and investment details.
 
                     {/* Stage 4: Business Proposal Submission */}
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 4 ? "border-orange-200 bg-orange-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 4
+                          ? "border-orange-200 bg-orange-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -1133,13 +1452,19 @@ Comprehensive project information and investment details.
                               selectedInterest.stage > 4
                                 ? "bg-green-500 text-white"
                                 : selectedInterest.stage === 4
-                                  ? "bg-orange-500 text-white"
-                                  : "bg-gray-300 text-gray-600"
+                                ? "bg-orange-500 text-white"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage > 4 ? <Check className="w-4 h-4" /> : "4"}
+                            {selectedInterest.stage > 4 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "4"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 4: Business Proposal Submission</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 4: Business Proposal Submission
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
@@ -1147,32 +1472,35 @@ Comprehensive project information and investment details.
                             selectedInterest.stage > 4
                               ? "bg-green-100 text-green-800"
                               : selectedInterest.stage === 4
-                                ? "bg-orange-100 text-orange-800"
-                                : "bg-gray-100 text-gray-600"
+                              ? "bg-orange-100 text-orange-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage > 4
                             ? "Completed"
                             : selectedInterest.stage === 4
-                              ? "In Progress"
-                              : "Pending"}
+                            ? "In Progress"
+                            : "Pending"}
                         </Badge>
                       </div>
                       <p className="text-gray-600 mb-4">
-                        Submit your comprehensive business proposal with financial projections and implementation
-                        strategy.
+                        Submit your comprehensive business proposal with
+                        financial projections and implementation strategy.
                       </p>
 
                       {selectedInterest.stage >= 4 && (
                         <div className="bg-white border border-gray-200 rounded-lg p-4">
-                          <h5 className="font-medium text-gray-800 mb-3">📤 Upload Business Proposal</h5>
+                          <h5 className="font-medium text-gray-800 mb-3">
+                            📤 Upload Business Proposal
+                          </h5>
                           <FileUploadZone
                             title="Business Proposal Document"
                             description="Upload your comprehensive business proposal"
                             acceptedTypes=".pdf,.doc,.docx"
                             maxSize="50MB"
                             status={
-                              selectedInterest.documents.businessProposal.status === "submitted"
+                              selectedInterest.documents.businessProposal
+                                .status === "submitted"
                                 ? "uploaded"
                                 : "required"
                             }
@@ -1183,7 +1511,11 @@ Comprehensive project information and investment details.
 
                     {/* Stage 5: HoD Review */}
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 5 ? "border-indigo-200 bg-indigo-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 5
+                          ? "border-indigo-200 bg-indigo-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -1192,13 +1524,19 @@ Comprehensive project information and investment details.
                               selectedInterest.stage > 5
                                 ? "bg-green-500 text-white"
                                 : selectedInterest.stage === 5
-                                  ? "bg-indigo-500 text-white"
-                                  : "bg-gray-300 text-gray-600"
+                                ? "bg-indigo-500 text-white"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage > 5 ? <Check className="w-4 h-4" /> : "5"}
+                            {selectedInterest.stage > 5 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "5"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 5: HoD Review</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 5: HoD Review
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
@@ -1206,26 +1544,28 @@ Comprehensive project information and investment details.
                             selectedInterest.stage > 5
                               ? "bg-green-100 text-green-800"
                               : selectedInterest.stage === 5
-                                ? "bg-indigo-100 text-indigo-800"
-                                : "bg-gray-100 text-gray-600"
+                              ? "bg-indigo-100 text-indigo-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage > 5
                             ? "Approved"
                             : selectedInterest.stage === 5
-                              ? "Under Review"
-                              : "Pending"}
+                            ? "Under Review"
+                            : "Pending"}
                         </Badge>
                       </div>
                       <p className="text-gray-600">
-                        Your proposal is being reviewed by the Head of Department. No action required from your side at
-                        this stage.
+                        Your proposal is being reviewed by the Head of
+                        Department. No action required from your side at this
+                        stage.
                       </p>
                       {selectedInterest.stage === 5 && (
                         <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mt-4">
                           <p className="text-indigo-800 text-sm">
-                            🔍 Your proposal is currently under review by the Head of Department. You will be notified
-                            of the decision.
+                            🔍 Your proposal is currently under review by the
+                            Head of Department. You will be notified of the
+                            decision.
                           </p>
                         </div>
                       )}
@@ -1233,7 +1573,11 @@ Comprehensive project information and investment details.
 
                     {/* Stage 6: PMC Generation */}
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 6 ? "border-teal-200 bg-teal-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 6
+                          ? "border-teal-200 bg-teal-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -1242,13 +1586,19 @@ Comprehensive project information and investment details.
                               selectedInterest.stage > 6
                                 ? "bg-green-500 text-white"
                                 : selectedInterest.stage === 6
-                                  ? "bg-teal-500 text-white"
-                                  : "bg-gray-300 text-gray-600"
+                                ? "bg-teal-500 text-white"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage > 6 ? <Check className="w-4 h-4" /> : "6"}
+                            {selectedInterest.stage > 6 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "6"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 6: PMC Generation</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 6: PMC Generation
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
@@ -1256,24 +1606,26 @@ Comprehensive project information and investment details.
                             selectedInterest.stage > 6
                               ? "bg-green-100 text-green-800"
                               : selectedInterest.stage === 6
-                                ? "bg-teal-100 text-teal-800"
-                                : "bg-gray-100 text-gray-600"
+                              ? "bg-teal-100 text-teal-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage > 6
                             ? "Completed"
                             : selectedInterest.stage === 6
-                              ? "In Progress"
-                              : "Pending"}
+                            ? "In Progress"
+                            : "Pending"}
                         </Badge>
                       </div>
                       <p className="text-gray-600">
-                        Project Model Canvas (PMC) is being generated by the PPP team based on your approved proposal.
+                        Project Model Canvas (PMC) is being generated by the PPP
+                        team based on your approved proposal.
                       </p>
                       {selectedInterest.stage === 6 && (
                         <div className="bg-teal-50 border border-teal-200 rounded-lg p-4 mt-4">
                           <p className="text-teal-800 text-sm">
-                            📋 PMC document is being prepared. You will receive a copy once completed.
+                            📋 PMC document is being prepared. You will receive
+                            a copy once completed.
                           </p>
                         </div>
                       )}
@@ -1281,7 +1633,11 @@ Comprehensive project information and investment details.
 
                     {/* Stage 7: MD/CEO Approval */}
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 7 ? "border-pink-200 bg-pink-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 7
+                          ? "border-pink-200 bg-pink-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -1290,13 +1646,19 @@ Comprehensive project information and investment details.
                               selectedInterest.stage > 7
                                 ? "bg-green-500 text-white"
                                 : selectedInterest.stage === 7
-                                  ? "bg-pink-500 text-white"
-                                  : "bg-gray-300 text-gray-600"
+                                ? "bg-pink-500 text-white"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage > 7 ? <Check className="w-4 h-4" /> : "7"}
+                            {selectedInterest.stage > 7 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "7"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 7: MD/CEO Approval</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 7: MD/CEO Approval
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
@@ -1304,26 +1666,26 @@ Comprehensive project information and investment details.
                             selectedInterest.stage > 7
                               ? "bg-green-100 text-green-800"
                               : selectedInterest.stage === 7
-                                ? "bg-pink-100 text-pink-800"
-                                : "bg-gray-100 text-gray-600"
+                              ? "bg-pink-100 text-pink-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage > 7
                             ? "Approved"
                             : selectedInterest.stage === 7
-                              ? "Under Review"
-                              : "Pending"}
+                            ? "Under Review"
+                            : "Pending"}
                         </Badge>
                       </div>
                       <p className="text-gray-600">
-                        Final approval is being sought from the MD/CEO. This is the last review stage before project
-                        approval.
+                        Final approval is being sought from the MD/CEO. This is
+                        the last review stage before project approval.
                       </p>
                       {selectedInterest.stage === 7 && (
                         <div className="bg-pink-50 border border-pink-200 rounded-lg p-4 mt-4">
                           <p className="text-pink-800 text-sm">
-                            👑 Your proposal is with the MD/CEO for final approval. You will be notified of the
-                            decision.
+                            👑 Your proposal is with the MD/CEO for final
+                            approval. You will be notified of the decision.
                           </p>
                         </div>
                       )}
@@ -1331,38 +1693,57 @@ Comprehensive project information and investment details.
 
                     {/* Stage 8: Presentation & KYC */}
                     <div
-                      className={`border rounded-lg p-6 ${selectedInterest.stage >= 8 ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"}`}
+                      className={`border rounded-lg p-6 ${
+                        selectedInterest.stage >= 8
+                          ? "border-green-200 bg-green-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
                           <div
                             className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              selectedInterest.stage >= 8 ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
+                              selectedInterest.stage >= 8
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-300 text-gray-600"
                             }`}
                           >
-                            {selectedInterest.stage >= 8 ? <Check className="w-4 h-4" /> : "8"}
+                            {selectedInterest.stage >= 8 ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              "8"
+                            )}
                           </div>
-                          <h4 className="text-lg font-medium text-gray-800">Stage 8: Presentation & KYC</h4>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 8: Presentation & KYC
+                          </h4>
                         </div>
                         <Badge
                           variant="secondary"
                           className={
-                            selectedInterest.stage >= 8 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
+                            selectedInterest.stage >= 8
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-600"
                           }
                         >
                           {selectedInterest.stage >= 8 ? "Active" : "Pending"}
                         </Badge>
                       </div>
                       <p className="text-gray-600 mb-4">
-                        Final stage: Present your project to stakeholders and complete KYC documentation.
+                        Final stage: Present your project to stakeholders and
+                        complete KYC documentation.
                       </p>
 
                       {selectedInterest.stage >= 8 && (
                         <div className="space-y-4">
                           <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h5 className="font-medium text-gray-800 mb-3">🎯 Presentation Scheduling</h5>
+                            <h5 className="font-medium text-gray-800 mb-3">
+                              🎯 Presentation Scheduling
+                            </h5>
                             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                              <p className="text-green-800 text-sm mb-3">📅 Your presentation has been scheduled:</p>
+                              <p className="text-green-800 text-sm mb-3">
+                                📅 Your presentation has been scheduled:
+                              </p>
                               <div className="space-y-2 text-sm">
                                 <p>
                                   <strong>Date:</strong> February 15, 2024
@@ -1371,13 +1752,18 @@ Comprehensive project information and investment details.
                                   <strong>Time:</strong> 2:00 PM - 3:30 PM
                                 </p>
                                 <p>
-                                  <strong>Location:</strong> Executive Conference Room
+                                  <strong>Location:</strong> Executive
+                                  Conference Room
                                 </p>
                                 <p>
-                                  <strong>Attendees:</strong> MD/CEO, HoD, PPP Team
+                                  <strong>Attendees:</strong> MD/CEO, HoD, PPP
+                                  Team
                                 </p>
                               </div>
-                              <Button size="sm" className="mt-3 bg-green-600 hover:bg-green-700 text-white">
+                              <Button
+                                size="sm"
+                                className="mt-3 bg-green-600 hover:bg-green-700 text-white"
+                              >
                                 <Calendar className="w-4 h-4 mr-2" />
                                 Add to Calendar
                               </Button>
@@ -1385,21 +1771,32 @@ Comprehensive project information and investment details.
                           </div>
 
                           <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <h5 className="font-medium text-gray-800 mb-3">📋 KYC Documentation</h5>
+                            <h5 className="font-medium text-gray-800 mb-3">
+                              📋 KYC Documentation
+                            </h5>
                             <div className="space-y-3">
                               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                                 <div className="flex items-center space-x-3">
                                   <FileText className="w-5 h-5 text-green-600" />
                                   <div>
-                                    <p className="font-medium text-green-800">KYC Form Template</p>
-                                    <p className="text-sm text-green-600">KYC_Form_v1.pdf</p>
+                                    <p className="font-medium text-green-800">
+                                      KYC Form Template
+                                    </p>
+                                    <p className="text-sm text-green-600">
+                                      KYC_Form_v1.pdf
+                                    </p>
                                   </div>
                                 </div>
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   className="border-green-200 bg-transparent"
-                                  onClick={() => handleDownload("kyc", selectedInterest.title)}
+                                  onClick={() =>
+                                    handleDownload(
+                                      "kyc",
+                                      selectedInterest.title
+                                    )
+                                  }
                                 >
                                   <Download className="w-4 h-4 mr-2" />
                                   Download
@@ -1411,7 +1808,12 @@ Comprehensive project information and investment details.
                                 description="Upload your completed KYC documentation"
                                 acceptedTypes=".pdf,.doc,.docx"
                                 maxSize="15MB"
-                                status={selectedInterest.documents.kyc.status === "submitted" ? "uploaded" : "required"}
+                                status={
+                                  selectedInterest.documents.kyc.status ===
+                                  "submitted"
+                                    ? "uploaded"
+                                    : "required"
+                                }
                               />
                             </div>
                           </div>
@@ -1422,21 +1824,30 @@ Comprehensive project information and investment details.
                 </CardContent>
               </Card>
             </div>
-          )
+          );
         }
 
         // Pagination for interests
-        const totalInterestPages = Math.ceil(myInterests.length / interestsPerPage)
-        const interestStartIndex = (interestsPage - 1) * interestsPerPage
-        const interestEndIndex = interestStartIndex + interestsPerPage
-        const currentInterests = myInterests.slice(interestStartIndex, interestEndIndex)
+        const totalInterestPages = Math.ceil(
+          myInterests.length / interestsPerPage
+        );
+        const interestStartIndex = (interestsPage - 1) * interestsPerPage;
+        const interestEndIndex = interestStartIndex + interestsPerPage;
+        const currentInterests = myInterests.slice(
+          interestStartIndex,
+          interestEndIndex
+        );
 
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">My Interests</h1>
-                <p className="text-gray-600">Track your expressed interests and application progress</p>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  My Interests
+                </h1>
+                <p className="text-gray-600">
+                  Track your expressed interests and application progress
+                </p>
               </div>
             </div>
 
@@ -1444,9 +1855,12 @@ Comprehensive project information and investment details.
               <Card className="shadow-lg border-0">
                 <CardContent className="p-12 text-center">
                   <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">No Interests Yet</h3>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    No Interests Yet
+                  </h3>
                   <p className="text-gray-600 mb-6">
-                    Browse available projects and express your interest to get started
+                    Browse available projects and express your interest to get
+                    started
                   </p>
                   <Button
                     className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
@@ -1464,10 +1878,17 @@ Comprehensive project information and investment details.
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div>
-                          <CardTitle className="text-xl">{interest.title}</CardTitle>
-                          <CardDescription>Project ID: {interest.id}</CardDescription>
+                          <CardTitle className="text-xl">
+                            {interest.title}
+                          </CardTitle>
+                          <CardDescription>
+                            Project ID: {interest.id}
+                          </CardDescription>
                         </div>
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        <Badge
+                          variant="secondary"
+                          className="bg-blue-100 text-blue-800"
+                        >
                           {interest.status}
                         </Badge>
                       </div>
@@ -1489,7 +1910,10 @@ Comprehensive project information and investment details.
                       </div>
 
                       {/* Status Timeline */}
-                      <StatusTimeline currentStage={interest.stage} documents={interest.documents} />
+                      <StatusTimeline
+                        currentStage={interest.stage}
+                        documents={interest.documents}
+                      />
 
                       {/* Action Buttons */}
                       <div className="flex flex-wrap gap-3 pt-4 border-t">
@@ -1512,7 +1936,8 @@ Comprehensive project information and investment details.
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div className="text-sm text-gray-600">
-                          Showing {interestStartIndex + 1}-{Math.min(interestEndIndex, myInterests.length)} of{" "}
+                          Showing {interestStartIndex + 1}-
+                          {Math.min(interestEndIndex, myInterests.length)} of{" "}
                           {myInterests.length} interests
                         </div>
                         <div className="flex items-center space-x-2">
@@ -1527,10 +1952,15 @@ Comprehensive project information and investment details.
                             Previous
                           </Button>
 
-                          {Array.from({ length: totalInterestPages }, (_, i) => i + 1).map((page) => (
+                          {Array.from(
+                            { length: totalInterestPages },
+                            (_, i) => i + 1
+                          ).map((page) => (
                             <Button
                               key={page}
-                              variant={interestsPage === page ? "default" : "outline"}
+                              variant={
+                                interestsPage === page ? "default" : "outline"
+                              }
                               size="sm"
                               onClick={() => setInterestsPage(page)}
                               className={
@@ -1561,15 +1991,19 @@ Comprehensive project information and investment details.
               </div>
             )}
           </div>
-        )
+        );
 
       case "documents":
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">Document Center</h1>
-                <p className="text-gray-600">Manage all your project-related documents</p>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  Document Center
+                </h1>
+                <p className="text-gray-600">
+                  Manage all your project-related documents
+                </p>
               </div>
             </div>
 
@@ -1578,22 +2012,30 @@ Comprehensive project information and investment details.
               <Card className="shadow-lg border-0">
                 <CardHeader>
                   <CardTitle>Available Downloads</CardTitle>
-                  <CardDescription>Documents ready for download</CardDescription>
+                  <CardDescription>
+                    Documents ready for download
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                     <div className="flex items-center space-x-3">
                       <FileText className="w-5 h-5 text-green-600" />
                       <div>
-                        <p className="font-medium text-green-800">Investment Certificate</p>
-                        <p className="text-sm text-green-600">Renewable Energy Project</p>
+                        <p className="font-medium text-green-800">
+                          Investment Certificate
+                        </p>
+                        <p className="text-sm text-green-600">
+                          Renewable Energy Project
+                        </p>
                       </div>
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
                       className="border-green-200 bg-transparent"
-                      onClick={() => handleDownload("ic", "Renewable Energy Project")}
+                      onClick={() =>
+                        handleDownload("ic", "Renewable Energy Project")
+                      }
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Download
@@ -1604,15 +2046,21 @@ Comprehensive project information and investment details.
                     <div className="flex items-center space-x-3">
                       <FileText className="w-5 h-5 text-green-600" />
                       <div>
-                        <p className="font-medium text-green-800">NDA Template</p>
-                        <p className="text-sm text-green-600">Renewable Energy Project</p>
+                        <p className="font-medium text-green-800">
+                          NDA Template
+                        </p>
+                        <p className="text-sm text-green-600">
+                          Renewable Energy Project
+                        </p>
                       </div>
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
                       className="border-green-200 bg-transparent"
-                      onClick={() => handleDownload("nda", "Renewable Energy Project")}
+                      onClick={() =>
+                        handleDownload("nda", "Renewable Energy Project")
+                      }
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Download
@@ -1623,15 +2071,24 @@ Comprehensive project information and investment details.
                     <div className="flex items-center space-x-3">
                       <FileText className="w-5 h-5 text-blue-600" />
                       <div>
-                        <p className="font-medium text-blue-800">Project Plan Template</p>
-                        <p className="text-sm text-blue-600">Renewable Energy Project</p>
+                        <p className="font-medium text-blue-800">
+                          Project Plan Template
+                        </p>
+                        <p className="text-sm text-blue-600">
+                          Renewable Energy Project
+                        </p>
                       </div>
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
                       className="border-blue-200 bg-transparent"
-                      onClick={() => handleDownload("project-plan", "Renewable Energy Project")}
+                      onClick={() =>
+                        handleDownload(
+                          "project-plan",
+                          "Renewable Energy Project"
+                        )
+                      }
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Download
@@ -1644,7 +2101,9 @@ Comprehensive project information and investment details.
               <Card className="shadow-lg border-0">
                 <CardHeader>
                   <CardTitle>Upload Required</CardTitle>
-                  <CardDescription>Documents you need to submit</CardDescription>
+                  <CardDescription>
+                    Documents you need to submit
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FileUploadZone
@@ -1674,7 +2133,273 @@ Comprehensive project information and investment details.
               </Card>
             </div>
           </div>
-        )
+        );
+
+      case "hod-requests":
+        if (selectedRefurbishment) {
+          const refurb = refurbishments.find(
+            (r) => r.id === selectedRefurbishment
+          );
+          if (!refurb) {
+            setSelectedRefurbishment(null);
+            return null;
+          }
+
+          return (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedRefurbishment(null)}
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-2" />
+                    Back to Requests
+                  </Button>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      Refurbishment Details
+                    </h2>
+                    <p className="text-gray-600">{refurb.projectTitle}</p>
+                  </div>
+                </div>
+                <Badge
+                  className={
+                    refurb.status === "awaiting_investor"
+                      ? "bg-blue-100 text-blue-800"
+                      : refurb.status === "pending_response"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-gray-100 text-gray-800"
+                  }
+                >
+                  {refurb.status === "awaiting_investor"
+                    ? "Awaiting Investor"
+                    : refurb.status === "pending_response"
+                    ? "Pending Response"
+                    : "Closed"}
+                </Badge>
+              </div>
+
+              {/* Overview */}
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <CardTitle>Request Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-4 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">Project</div>
+                      <div className="font-medium">{refurb.projectTitle}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">Investor</div>
+                      <div className="font-medium">{refurb.investorName}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">HoD</div>
+                      <div className="font-medium">{refurb.hodName}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Request Date
+                      </div>
+                      <div className="font-medium">{refurb.requestDate}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* HoD Comment */}
+              <Card className="shadow-lg border-0 border-l-4 border-l-red-500">
+                <CardHeader>
+                  <CardTitle className="text-red-800">
+                    PPP Member Comment
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <p className="text-gray-800">{refurb.hodComment}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Required Documents Selection */}
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <CardTitle>Required Documents for Investor</CardTitle>
+                  <CardDescription>
+                    Re-upload these documents to address the feedback
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FileUploadZone
+                    title="Signed Investment Certificate"
+                    description="Upload your signed IC document"
+                    acceptedTypes=".pdf,.doc,.docx"
+                    maxSize="10MB"
+                    status="required"
+                  />
+
+                  <FileUploadZone
+                    title="Signed NDA"
+                    description="Upload your signed NDA document"
+                    acceptedTypes=".pdf,.doc,.docx"
+                    maxSize="10MB"
+                    status="required"
+                  />
+
+                  <FileUploadZone
+                    title="Business Proposal"
+                    description="Upload your detailed business proposal"
+                    acceptedTypes=".pdf,.doc,.docx"
+                    maxSize="25MB"
+                    status="optional"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Action Buttons */}
+              {refurb.status !== "closed" && (
+                <Card className="shadow-lg border-0">
+                  <CardContent className="p-6">
+                    <div className="flex gap-3">
+                      <Button
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => handleSendRefurbishment(refurb.id)}
+                        disabled={
+                          !refurbPppComment || selectedDocuments.length === 0
+                        }
+                      >
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Refurbishment Request
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Current Status */}
+              {refurb.pppMemberComment && (
+                <Card className="shadow-lg border-0 border-l-4 border-l-green-500">
+                  <CardHeader>
+                    <CardTitle className="text-green-800">
+                      Current Response Sent
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Your Response:
+                      </p>
+                      <p className="text-gray-800">{refurb.pppMemberComment}</p>
+                    </div>
+                    {refurb.requiredDocuments.length > 0 && (
+                      <div>
+                        <p className="text-sm text-gray-600 mb-2">
+                          Required Documents:
+                        </p>
+                        <div className="space-y-2">
+                          {refurb.requiredDocuments.map((doc, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center space-x-2 text-gray-700"
+                            >
+                              <FileText className="w-4 h-4 text-blue-600" />
+                              <span>{doc}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  HoD Refurbishment Requests
+                </h1>
+                <p className="text-gray-600">
+                  Manage refurbishment requests from the Head of Department
+                </p>
+              </div>
+            </div>
+
+            {refurbishments.length === 0 ? (
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-12 text-center">
+                  <CheckCircle className="w-16 h-16 text-green-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    No Pending Requests
+                  </h3>
+                  <p className="text-gray-600">
+                    All proposals are currently progressing normally
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {refurbishments.map((refurb) => (
+                  <Card
+                    key={refurb.id}
+                    className="shadow-lg border-0 border-l-4 border-l-yellow-500"
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="text-lg">
+                            {refurb.projectTitle}
+                          </CardTitle>
+                          <CardDescription>
+                            {refurb.investorName} • From: {refurb.hodName}
+                          </CardDescription>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <Badge
+                            className={
+                              refurb.status === "awaiting_investor"
+                                ? "bg-blue-100 text-blue-800"
+                                : refurb.status === "pending_response"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-gray-100 text-gray-800"
+                            }
+                          >
+                            {refurb.status === "awaiting_investor"
+                              ? "Awaiting Investor"
+                              : refurb.status === "pending_response"
+                              ? "Pending Response"
+                              : "Closed"}
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedRefurbishment(refurb.id)}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View More
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <p className="text-sm text-gray-700">
+                          {refurb.hodComment}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        );
 
       case "settings":
         return (
@@ -1682,7 +2407,9 @@ Comprehensive project information and investment details.
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
-                <p className="text-gray-600">Manage your account information and preferences</p>
+                <p className="text-gray-600">
+                  Manage your account information and preferences
+                </p>
               </div>
             </div>
 
@@ -1696,8 +2423,12 @@ Comprehensive project information and investment details.
                     <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <User className="w-10 h-10 text-blue-600" />
                     </div>
-                    <h3 className="font-semibold text-gray-800">John Investor</h3>
-                    <p className="text-sm text-gray-600">john.investor@email.com</p>
+                    <h3 className="font-semibold text-gray-800">
+                      John Investor
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      john.investor@email.com
+                    </p>
                   </div>
                   <Button variant="outline" className="w-full bg-transparent">
                     Change Photo
@@ -1713,7 +2444,9 @@ Comprehensive project information and investment details.
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          First Name
+                        </label>
                         <input
                           type="text"
                           defaultValue="John"
@@ -1721,7 +2454,9 @@ Comprehensive project information and investment details.
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Last Name
+                        </label>
                         <input
                           type="text"
                           defaultValue="Investor"
@@ -1729,7 +2464,9 @@ Comprehensive project information and investment details.
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email
+                        </label>
                         <input
                           type="email"
                           defaultValue="john.investor@email.com"
@@ -1737,7 +2474,9 @@ Comprehensive project information and investment details.
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone
+                        </label>
                         <input
                           type="tel"
                           defaultValue="+1 (555) 123-4567"
@@ -1745,7 +2484,9 @@ Comprehensive project information and investment details.
                         />
                       </div>
                     </div>
-                    <Button className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900">Save Changes</Button>
+                    <Button className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900">
+                      Save Changes
+                    </Button>
                   </CardContent>
                 </Card>
 
@@ -1756,7 +2497,9 @@ Comprehensive project information and investment details.
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Sectors</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Preferred Sectors
+                        </label>
                         <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                           <option value="">Select sectors</option>
                           <option value="infrastructure">Infrastructure</option>
@@ -1765,7 +2508,9 @@ Comprehensive project information and investment details.
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Investment Range</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Investment Range
+                        </label>
                         <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                           <option value="">Select range</option>
                           <option value="0-25">$0M - $25M</option>
@@ -1785,24 +2530,47 @@ Comprehensive project information and investment details.
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-gray-800">Email Notifications</p>
-                          <p className="text-sm text-gray-600">Receive updates about your projects via email</p>
+                          <p className="font-medium text-gray-800">
+                            Email Notifications
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Receive updates about your projects via email
+                          </p>
                         </div>
-                        <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600" />
+                        <input
+                          type="checkbox"
+                          defaultChecked
+                          className="w-4 h-4 text-blue-600"
+                        />
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-gray-800">SMS Notifications</p>
-                          <p className="text-sm text-gray-600">Receive urgent updates via SMS</p>
+                          <p className="font-medium text-gray-800">
+                            SMS Notifications
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Receive urgent updates via SMS
+                          </p>
                         </div>
-                        <input type="checkbox" className="w-4 h-4 text-blue-600" />
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 text-blue-600"
+                        />
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-gray-800">Project Updates</p>
-                          <p className="text-sm text-gray-600">Get notified when project status changes</p>
+                          <p className="font-medium text-gray-800">
+                            Project Updates
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Get notified when project status changes
+                          </p>
                         </div>
-                        <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600" />
+                        <input
+                          type="checkbox"
+                          defaultChecked
+                          className="w-4 h-4 text-blue-600"
+                        />
                       </div>
                     </div>
                   </CardContent>
@@ -1810,12 +2578,12 @@ Comprehensive project information and investment details.
               </div>
             </div>
           </div>
-        )
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <>
@@ -1834,25 +2602,39 @@ Comprehensive project information and investment details.
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Confirm Interest</h3>
-              <Button variant="ghost" size="sm" onClick={() => setShowInterestModal(false)}>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Confirm Interest
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowInterestModal(false)}
+              >
                 <X className="w-4 h-4" />
               </Button>
             </div>
 
             {pendingInterestProject && (
               <div className="space-y-4">
-                <p className="text-gray-600">Are you sure you want to express interest in:</p>
+                <p className="text-gray-600">
+                  Are you sure you want to express interest in:
+                </p>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-800">{pendingInterestProject.title}</h4>
+                  <h4 className="font-medium text-gray-800">
+                    {pendingInterestProject.title}
+                  </h4>
                   <p className="text-sm text-gray-600 mt-1">
-                    {pendingInterestProject.sector} • {pendingInterestProject.location}
+                    {pendingInterestProject.sector} •{" "}
+                    {pendingInterestProject.location}
                   </p>
-                  <p className="text-sm text-gray-600">Investment: {pendingInterestProject.investmentRange}</p>
+                  <p className="text-sm text-gray-600">
+                    Investment: {pendingInterestProject.investmentRange}
+                  </p>
                 </div>
                 <p className="text-sm text-gray-600">
-                  By confirming, you'll be added to the project's interested investor list and will receive relevant
-                  project documents and updates.
+                  By confirming, you'll be added to the project's interested
+                  investor list and will receive relevant project documents and
+                  updates.
                 </p>
 
                 <div className="flex space-x-3 pt-4">
@@ -1882,10 +2664,12 @@ Comprehensive project information and investment details.
           <Check className="w-5 h-5" />
           <div>
             <p className="font-medium">Interest Registered Successfully!</p>
-            <p className="text-sm opacity-90">You will be contacted shortly with project details.</p>
+            <p className="text-sm opacity-90">
+              You will be contacted shortly with project details.
+            </p>
           </div>
         </div>
       )}
     </>
-  )
+  );
 }

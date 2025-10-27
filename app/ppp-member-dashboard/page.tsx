@@ -26,10 +26,14 @@ import {
   Users,
   TrendingUp,
   X,
+  Check,
+  Download,
   ChevronLeft,
   Search,
-} from "lucide-react"
-import { DashboardLayout } from "@/components/dashboard-layout"
+  Calendar,
+} from "lucide-react";
+import { DashboardLayout } from "@/components/dashboard-layout";
+import { FileUploadZone } from "@/components/file-upload-zone";
 
 const investorInterests = [
   {
@@ -686,15 +690,22 @@ export default function PPPMemberDashboard() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <Button variant="outline" onClick={() => setSelectedInterest(null)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedInterest(null)}
+                  >
                     ← Back to Interests
                   </Button>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800">Interest Tracking</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      Interest Tracking
+                    </h2>
                     <p className="text-gray-600">{interest.projectTitle}</p>
                   </div>
                 </div>
-                <Badge className="bg-blue-100 text-blue-800">{interest.status}</Badge>
+                <Badge className="bg-blue-100 text-blue-800">
+                  {interest.status}
+                </Badge>
               </div>
 
               <Card className="shadow-lg border-0">
@@ -704,20 +715,346 @@ export default function PPPMemberDashboard() {
                 <CardContent>
                   <div className="grid md:grid-cols-4 gap-4">
                     <div>
-                      <div className="text-sm text-gray-600 mb-1">Investor Name</div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Investor Name
+                      </div>
                       <div className="font-medium">{interest.investorName}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600 mb-1">Contact Email</div>
-                      <div className="font-medium">{interest.investorEmail}</div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Contact Email
+                      </div>
+                      <div className="font-medium">
+                        {interest.investorEmail}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600 mb-1">Project ID</div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Project ID
+                      </div>
                       <Badge variant="outline">{interest.projectId}</Badge>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600 mb-1">Submission Date</div>
-                      <div className="font-medium">{interest.expressedDate}</div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Submission Date
+                      </div>
+                      <div className="font-medium">
+                        {interest.expressedDate}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Application Stages
+                    </h3>
+
+                    {/* Stage 1: Interest Expressed */}
+                    <div
+                      className={`border rounded-lg p-6 ${
+                        2 >= 1
+                          ? "border-green-200 bg-green-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              2 > 1
+                                ? "bg-green-500 text-white"
+                                : 2 === 1
+                                ? "bg-yellow-400 text-yellow-900"
+                                : "bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            {2 > 1 ? <Check className="w-4 h-4" /> : "1"}
+                          </div>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 1: Interest Expressed
+                          </h4>
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className={
+                            2 > 1
+                              ? "bg-green-100 text-green-800"
+                              : 2 === 1
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-600"
+                          }
+                        >
+                          {2 > 1
+                            ? "Approved"
+                            : 2 === 1
+                            ? "Pending"
+                            : "Not Started"}
+                        </Badge>
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        Your interest in this project has been registered and is
+                        being reviewed by the PPP team.
+                      </p>
+                      {selectedInterest.stage === 1 && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                          <p className="text-yellow-800 text-sm">
+                            ⏳ Your interest is currently under review. You will
+                            be notified once approved.
+                          </p>
+                        </div>
+                      )}
+                      {2 > 1 && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <p className="text-green-800 text-sm">
+                            ✅ Interest approved. Moving to document exchange
+                            phase.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Stage 2: IC/NDA */}
+                    <div
+                      className={`border rounded-lg p-6 ${
+                        3 >= 2
+                          ? "border-blue-200 bg-blue-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              3 > 2
+                                ? "bg-green-500 text-white"
+                                : selectedInterest.stage === 2
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            {3 > 2 ? <Check className="w-4 h-4" /> : "2"}
+                          </div>
+                          <h4 className="text-lg font-medium text-gray-800">
+                            Stage 2: IC/NDA Exchange
+                          </h4>
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className={
+                            3 > 2
+                              ? "bg-green-100 text-green-800"
+                              : selectedInterest.stage === 2
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-600"
+                          }
+                        >
+                          {3 > 2
+                            ? "Completed"
+                            : selectedInterest.stage === 2
+                            ? "In Progress"
+                            : "Pending"}
+                        </Badge>
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        Download, sign, and upload the Investment Certificate
+                        and Non-Disclosure Agreement documents.
+                      </p>
+
+                      {3 >= 2 && (
+                        <div className="space-y-4">
+                          {/* Download Section */}
+                          <div className="bg-white border border-gray-200 rounded-lg p-4">
+                            <h5 className="font-medium text-gray-800 mb-3">
+                              📥 Download Documents
+                            </h5>
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <div className="flex items-center space-x-3">
+                                  <FileText className="w-5 h-5 text-blue-600" />
+                                  <div>
+                                    <p className="font-medium text-blue-800">
+                                      Investment Certificate Template
+                                    </p>
+                                    <p className="text-sm text-blue-600">
+                                      IC_Template_v2.pdf
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-blue-200 bg-transparent"
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Download
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-blue-200 bg-danger"
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Reject
+                                </Button>
+                              </div>
+                              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <div className="flex items-center space-x-3">
+                                  <FileText className="w-5 h-5 text-blue-600" />
+                                  <div>
+                                    <p className="font-medium text-blue-800">
+                                      Non-Disclosure Agreement
+                                    </p>
+                                    <p className="text-sm text-blue-600">
+                                      NDA_Template_v2.pdf
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-blue-200 bg-transparent"
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Download
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-blue-200 bg-danger"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  Reject
+                                </Button>
+                              </div>
+
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-blue-200 bg-transparent"
+                              >
+                                <Download className="w-4 h-4 mr-2" />
+                                Approve Stage
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+
+                    {/* Stage 8: Presentation & KYC */}
+                    <div
+                      className={`border rounded-lg p-6 ${9 >= 8 ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"}`}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              9 >= 8 ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
+                            }`}
+                          >
+                            {9 >= 8 ? <Check className="w-4 h-4" /> : "8"}
+                          </div>
+                          <h4 className="text-lg font-medium text-gray-800">Stage 8: Presentation & KYC</h4>
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className={
+                            9 >= 8 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
+                          }
+                        >
+                          {9 >= 8 ? "Active" : "Pending"}
+                        </Badge>
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        Final stage: Present your project to stakeholders and complete KYC documentation.
+                      </p>
+
+                      {9 >= 8 && (
+                        <div className="space-y-4">
+                          <div className="bg-white border border-gray-200 rounded-lg p-4">
+                            <h5 className="font-medium text-gray-800 mb-3">🎯 Presentation Scheduling</h5>
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                              <p className="text-green-800 text-sm mb-3">📅 Your presentation has been scheduled:</p>
+                              <div className="space-y-2 text-sm">
+                                <p>
+                                  <strong>Date:</strong> February 15, 2024
+                                </p>
+                                <p>
+                                  <strong>Time:</strong> 2:00 PM - 3:30 PM
+                                </p>
+                                <p>
+                                  <strong>Location:</strong> Executive Conference Room
+                                </p>
+                                <p>
+                                  <strong>Attendees:</strong> MD/CEO, HoD, PPP Team
+                                </p>
+                              </div>
+                              <Button size="sm" className="mt-3 bg-green-600 hover:bg-green-700 text-white">
+                                <Calendar className="w-4 h-4 mr-2" />
+                                Add to Calendar
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="bg-white border border-gray-200 rounded-lg p-4">
+                            <h5 className="font-medium text-gray-800 mb-3">📋 KYC Documentation</h5>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                <div className="flex items-center space-x-3">
+                                  <FileText className="w-5 h-5 text-green-600" />
+                                  <div>
+                                    <p className="font-medium text-green-800">KYC Form Template</p>
+                                    <p className="text-sm text-green-600">KYC_Form_v1.pdf</p>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-green-200 bg-transparent"
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Download
+                                </Button>
+                              </div>
+
+                              <FileUploadZone
+                                title="Completed KYC Form"
+                                description="Upload your completed KYC documentation"
+                                acceptedTypes=".pdf,.doc,.docx"
+                                maxSize="15MB"
+                                status={"submitted" === "submitted" ? "uploaded" : "required"}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* {Buttom Buttons} */}
+                    <div
+                      className={`border rounded-lg p-6 ${
+                        3 >= 2
+                          ? "border-blue-200 bg-blue-50"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
+                    >
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-blue-200 bg-success"
+                      >
+                        <Download className="w-4 h-4" />
+                        Approve Proposal
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-blue-200 bg-danger"
+                      >
+                        <Download className="w-4 h-4" />
+                        Cancel Proposal
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -731,18 +1068,23 @@ export default function PPPMemberDashboard() {
                         <CheckCircle className="w-6 h-6 text-green-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-green-800">Stage 1: Interest Expressed</CardTitle>
+                        <CardTitle className="text-green-800">
+                          Stage 1: Interest Expressed
+                        </CardTitle>
                         <CardDescription>
-                          Interest submitted on {interest.stages.interestExpressed.date}
+                          Interest submitted on{" "}
+                          {interest.stages.interestExpressed.date}
                         </CardDescription>
                       </div>
                     </div>
-                    <Badge className="bg-green-100 text-green-800">Completed</Badge>
+                    <Badge className="bg-green-100 text-green-800">
+                      Completed
+                    </Badge>
                   </div>
                 </CardHeader>
               </Card>
             </div>
-          )
+          );
         }
 
         return (
@@ -935,6 +1277,135 @@ export default function PPPMemberDashboard() {
         )
 
       case "documents":
+
+      
+        if (viewingDocuments) {
+          const interest = interests.find((i) => i.id === viewingDocuments)
+          if (!interest) {
+            setViewingDocuments(null)
+            return null
+          }
+
+          const filteredDocs =
+            filterStage === "all"
+              ? getAllDocuments(interest)
+              : getAllDocuments(interest).filter((doc) => doc.stageKey === filterStage)
+
+          const searchedDocs = filteredDocs.filter((doc) => doc.name.toLowerCase().includes(searchTerm.toLowerCase()))
+
+          return (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Button variant="outline" onClick={() => setViewingDocuments(null)}>
+                    <ChevronLeft className="w-4 h-4 mr-2" />
+                    Back to Interests
+                  </Button>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800">Document Center</h2>
+                    <p className="text-gray-600">{interest.projectTitle}</p>
+                  </div>
+                </div>
+              </div>
+
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <CardTitle>Interest Information</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-4 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">Investor</div>
+                      <div className="font-medium">{interest.investorName}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">Email</div>
+                      <div className="font-medium">{interest.investorEmail}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">Status</div>
+                      <Badge className="bg-blue-100 text-blue-800">{interest.status}</Badge>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600 mb-1">Total Documents</div>
+                      <div className="font-medium">{getAllDocuments(interest).length}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Input
+                        placeholder="Search documents by name..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <select
+                      value={filterStage}
+                      onChange={(e) => setFilterStage(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="all">All Stages</option>
+                      <option value="icNdaExchange">IC/NDA Exchange</option>
+                      <option value="businessProposal">Business Proposal</option>
+                      <option value="hodReview">HoD Review</option>
+                      <option value="mdCeoApproval">MD/CEO Approval</option>
+                      <option value="kyc">KYC</option>
+                    </select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {searchedDocs.length > 0 ? (
+                <div className="space-y-4">
+                  {searchedDocs.map((doc, index) => (
+                    <Card key={index} className="shadow-lg border-0">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <FileText className="w-6 h-6 text-blue-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-gray-800">{doc.name}</h3>
+                              <div className="text-sm text-gray-600 space-y-1">
+                                <p>
+                                  Stage: <Badge variant="outline">{doc.stage}</Badge>
+                                </p>
+                                <p>
+                                  {doc.size} • Uploaded {doc.uploadDate}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                            <Download className="w-4 h-4 mr-2" />
+                            Download
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="shadow-lg border-0">
+                  <CardContent className="p-12 text-center">
+                    <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No Documents Found</h3>
+                    <p className="text-gray-600">Try adjusting your search or filter criteria</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )
+        }
+
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -943,6 +1414,57 @@ export default function PPPMemberDashboard() {
                 <p className="text-gray-600">View and download documents from your interests</p>
               </div>
             </div>
+
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input
+                placeholder="Search by interest ID, investor name, or project title..."
+                value={documentsSearchTerm}
+                onChange={(e) => setDocumentsSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            {interests
+              .filter(
+                (interest) =>
+                  interest.id.toLowerCase().includes(documentsSearchTerm.toLowerCase()) ||
+                  interest.investorName.toLowerCase().includes(documentsSearchTerm.toLowerCase()) ||
+                  interest.projectTitle.toLowerCase().includes(documentsSearchTerm.toLowerCase()),
+              )
+              .map((interest) => (
+                <Card key={interest.id} className="shadow-lg border-0">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center space-x-2 mb-1">
+                          <CardTitle className="text-lg">{interest.projectTitle}</CardTitle>
+                          <Badge variant="outline" className="text-xs">
+                            {interest.id}
+                          </Badge>
+                        </div>
+                        <CardDescription>{interest.investorName}</CardDescription>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800">{interest.status}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2 text-gray-600">
+                        <FileText className="w-5 h-5" />
+                        <span>{getAllDocuments(interest).length} documents available</span>
+                      </div>
+                      <Button
+                        onClick={() => setViewingDocuments(interest.id)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Documents
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
             <Card className="shadow-lg border-0">
               <CardContent className="p-12 text-center">
                 <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
