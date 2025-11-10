@@ -1,11 +1,24 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Bell, Menu, X, LogOut, Settings, User, Building2 } from "lucide-react"
+import {
+  Bell,
+  Menu,
+  X,
+  LogOut,
+  Settings,
+  User,
+  Building2,
+  AlertCircle,
+  CheckCircle,
+  Info,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react"
 import Link from "next/link"
+import { systemNotifications } from "@/lib/notifications"
 
 interface NavigationItem {
   name: string
@@ -22,6 +35,18 @@ interface DashboardLayoutProps {
   setActiveTab: (tab: string) => void
 }
 
+const getNotificationIcon = (iconName: string) => {
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    Bell: Bell,
+    AlertCircle: AlertCircle,
+    CheckCircle: CheckCircle,
+    Info: Info,
+    XCircle: XCircle,
+    AlertTriangle: AlertTriangle,
+  }
+  return iconMap[iconName] || Bell
+}
+
 export function DashboardLayout({
   children,
   userRole,
@@ -31,7 +56,8 @@ export function DashboardLayout({
   setActiveTab,
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [notificationCount] = useState(3)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notificationCount] = useState(systemNotifications.length)
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -64,6 +90,32 @@ export function DashboardLayout({
         return "MD/CEO"
       default:
         return "User"
+    }
+  }
+
+  const getNotificationBgColor = (type: string) => {
+    switch (type) {
+      case "success":
+        return "bg-green-50"
+      case "warning":
+        return "bg-yellow-50"
+      case "error":
+        return "bg-red-50"
+      default:
+        return "bg-blue-50"
+    }
+  }
+
+  const getNotificationIconColor = (type: string) => {
+    switch (type) {
+      case "success":
+        return "text-green-600"
+      case "warning":
+        return "text-yellow-600"
+      case "error":
+        return "text-red-600"
+      default:
+        return "text-blue-600"
     }
   }
 
@@ -167,14 +219,59 @@ export function DashboardLayout({
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* Notifications */}
               <div className="relative">
-                <Button variant="ghost" size="sm">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative"
+                >
                   <Bell className="w-5 h-5" />
                 </Button>
                 {notificationCount > 0 && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
                     <span className="text-xs font-medium text-white">{notificationCount}</span>
+                  </div>
+                )}
+
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                    <div className="p-4 border-b border-gray-200">
+                      <h3 className="font-semibold text-gray-800">Recent Notifications</h3>
+                      <p className="text-xs text-gray-500 mt-1">You have {notificationCount} notifications</p>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {systemNotifications.slice(0, 4).map((notif) => {
+                        const IconComponent = getNotificationIcon(notif.icon)
+                        return (
+                          <div
+                            key={notif.id}
+                            className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition ${getNotificationBgColor(notif.type)}`}
+                          >
+                            <div className="flex items-start space-x-3">
+                              <IconComponent className={`w-5 h-5 mt-0.5 ${getNotificationIconColor(notif.type)}`} />
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-800 text-sm">{notif.title}</p>
+                                <p className="text-gray-600 text-xs mt-1">{notif.message}</p>
+                                <p className="text-gray-500 text-xs mt-2">{notif.timestamp}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="p-4 border-t border-gray-200">
+                      <Button
+                        variant="outline"
+                        className="w-full text-sm bg-transparent"
+                        onClick={() => {
+                          setActiveTab("notifications")
+                          setShowNotifications(false)
+                        }}
+                      >
+                        View All Notifications
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>

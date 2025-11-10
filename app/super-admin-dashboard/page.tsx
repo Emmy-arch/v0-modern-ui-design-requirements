@@ -30,7 +30,26 @@ import {
   Calendar,
   MessageSquare,
   FileCheck,
+  TrendingUp,
+  AlertCircle,
+  Clock,
+  BarChart3,
 } from "lucide-react"
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { FileUploadZone } from "@/components/file-upload-zone"
 import {
@@ -41,6 +60,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
+import { systemNotifications } from "@/lib/notifications" // Imported systemNotifications
 
 const users = [
   {
@@ -260,6 +280,93 @@ const savedSMSTemplates = [
   },
 ]
 
+const systemHealthData = {
+  uptime: 99.95,
+  downtime: 0.05,
+  totalMonitors: 12,
+  activeAlerts: 2,
+  lastChecked: "2024-01-28 15:45:30",
+}
+
+const uptimeHistory = [
+  { month: "December 2023", uptime: 99.92, downtime: 0.08, incidents: 1 },
+  { month: "January 2024", uptime: 99.95, downtime: 0.05, incidents: 0 },
+  { month: "February 2024", uptime: 99.88, downtime: 0.12, incidents: 2 },
+  { month: "March 2024", uptime: 99.99, downtime: 0.01, incidents: 0 },
+  { month: "April 2024", uptime: 99.91, downtime: 0.09, incidents: 1 },
+  { month: "May 2024", uptime: 99.97, downtime: 0.03, incidents: 0 },
+]
+
+const emailServiceData = {
+  sentToday: 342,
+  pendingToday: 12,
+  failedToday: 3,
+  avgDeliveryTime: "2.3s",
+}
+
+const emailHistoryLast7Days = [
+  { date: "Jan 22", sent: 284, pending: 5, failed: 1 },
+  { date: "Jan 23", sent: 312, pending: 8, failed: 2 },
+  { date: "Jan 24", sent: 298, pending: 3, failed: 0 },
+  { date: "Jan 25", sent: 325, pending: 11, failed: 1 },
+  { date: "Jan 26", sent: 308, pending: 7, failed: 2 },
+  { date: "Jan 27", sent: 335, pending: 9, failed: 1 },
+  { date: "Jan 28", sent: 342, pending: 12, failed: 3 },
+]
+
+const systemServices = [
+  { name: "Web Server", status: "Operational", uptime: 99.98, responseTime: "145ms" },
+  { name: "Database", status: "Operational", uptime: 99.99, responseTime: "12ms" },
+  { name: "Email Service", status: "Operational", uptime: 99.92, responseTime: "2.3s" },
+  { name: "File Storage", status: "Operational", uptime: 99.95, responseTime: "234ms" },
+  { name: "Cache Server", status: "Warning", uptime: 98.5, responseTime: "1.2s" },
+  { name: "API Gateway", status: "Operational", uptime: 99.97, responseTime: "89ms" },
+]
+
+const systemNotificationsData = [
+  // Renamed to avoid conflict with imported systemNotifications
+  {
+    id: "NOTIF-001",
+    title: "System Maintenance Scheduled",
+    message: "System maintenance is scheduled for next Sunday from 2 AM to 4 AM PST.",
+    timestamp: "2024-01-28 15:00:00",
+    type: "info",
+    icon: Bell,
+  },
+  {
+    id: "NOTIF-002",
+    title: "New User Registration",
+    message: "A new user has registered with the email address john.doe@example.com.",
+    timestamp: "2024-01-28 14:30:00",
+    type: "success",
+    icon: Users,
+  },
+  {
+    id: "NOTIF-003",
+    title: "High CPU Usage Detected",
+    message: "CPU usage on server web-01 has exceeded 90% for the last 10 minutes.",
+    timestamp: "2024-01-28 13:45:00",
+    type: "warning",
+    icon: AlertCircle,
+  },
+  {
+    id: "NOTIF-004",
+    title: "Database Backup Completed",
+    message: "Daily database backup completed successfully at 03:00 AM.",
+    timestamp: "2024-01-28 03:05:00",
+    type: "success",
+    icon: Database,
+  },
+  {
+    id: "NOTIF-005",
+    title: "Incoming Investment Proposal",
+    message: "New investment proposal received for Project Alpha.",
+    timestamp: "2024-01-27 16:00:00",
+    type: "info",
+    icon: FileCheck,
+  },
+]
+
 export default function SuperAdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
   const [showCreateUser, setShowCreateUser] = useState(false)
@@ -273,6 +380,14 @@ export default function SuperAdminDashboard() {
   const [showDeleteTemplate, setShowDeleteTemplate] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
   const [editingTemplate, setEditingTemplate] = useState<any>(null)
+  const [showExportDialog, setShowExportDialog] = useState(false)
+  const [exportType, setExportType] = useState("")
+
+  const [notificationFilter, setNotificationFilter] = useState<"all" | "success" | "warning" | "error" | "info">("all")
+  const [notificationPage, setNotificationPage] = useState(1)
+  const [notificationSearch, setNotificationSearch] = useState("")
+
+  const itemsPerPage = 5
 
   const navigation = [
     { name: "Overview", id: "overview", icon: Activity },
@@ -281,6 +396,8 @@ export default function SuperAdminDashboard() {
     { name: "System Settings", id: "settings", icon: Settings },
     { name: "Document Templates", id: "templates", icon: FileText },
     { name: "Communications", id: "communications", icon: Mail },
+    { name: "System Health", id: "system-health", icon: BarChart3 },
+    { name: "Notifications", id: "notifications", icon: Bell },
   ]
 
   const handleEditUser = (user: any) => {
@@ -306,6 +423,75 @@ export default function SuperAdminDashboard() {
     setEditingTemplate({ ...template, templateType: type })
   }
 
+  const handleExport = (format: string) => {
+    const timestamp = new Date().toISOString().split("T")[0]
+    let content = ""
+    let filename = ""
+
+    if (format === "csv") {
+      content = generateCSVReport()
+      filename = `system-health-${timestamp}.csv`
+    } else if (format === "json") {
+      content = JSON.stringify(generateJSONReport(), null, 2)
+      filename = `system-health-${timestamp}.json`
+    } else if (format === "pdf") {
+      filename = `system-health-${timestamp}.pdf`
+      // In a real app, you'd use a library like pdfkit or html2pdf
+      alert("PDF export would be generated using a PDF library")
+      return
+    }
+
+    if (format === "csv" || format === "json") {
+      const blob = new Blob([content], { type: "text/plain" })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    }
+
+    setShowExportDialog(false)
+  }
+
+  const generateCSVReport = () => {
+    let csv = "System Health Report\n"
+    csv += `Generated: ${new Date().toLocaleString()}\n\n`
+
+    csv += "UPTIME HISTORY\n"
+    csv += "Month,Uptime %,Downtime %,Incidents\n"
+    uptimeHistory.forEach((row) => {
+      csv += `${row.month},${row.uptime},${row.downtime},${row.incidents}\n`
+    })
+
+    csv += "\nEMAIL SERVICE (Last 7 Days)\n"
+    csv += "Date,Sent,Pending,Failed\n"
+    emailHistoryLast7Days.forEach((row) => {
+      csv += `${row.date},${row.sent},${row.pending},${row.failed}\n`
+    })
+
+    csv += "\nSYSTEM SERVICES\n"
+    csv += "Service,Status,Uptime %,Response Time\n"
+    systemServices.forEach((service) => {
+      csv += `${service.name},${service.status},${service.uptime},${service.responseTime}\n`
+    })
+
+    return csv
+  }
+
+  const generateJSONReport = () => {
+    return {
+      generatedAt: new Date().toISOString(),
+      systemHealth: systemHealthData,
+      uptimeHistory,
+      emailServiceData,
+      emailHistoryLast7Days,
+      systemServices,
+    }
+  }
+
   const filteredInterests = userInterests.filter((interest) => {
     if (interestFilter === "all") return true
     return interest.status === interestFilter
@@ -315,6 +501,20 @@ export default function SuperAdminDashboard() {
     if (activityFilter === "all") return true
     return activity.type === activityFilter
   })
+
+  const filteredNotifications = systemNotifications.filter((notif) => {
+    const matchesType = notificationFilter === "all" || notif.type === notificationFilter
+    const matchesSearch =
+      notif.title.toLowerCase().includes(notificationSearch.toLowerCase()) ||
+      notif.message.toLowerCase().includes(notificationSearch.toLowerCase())
+    return matchesType && matchesSearch
+  })
+
+  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage)
+  const paginatedNotifications = filteredNotifications.slice(
+    (notificationPage - 1) * itemsPerPage,
+    notificationPage * itemsPerPage,
+  )
 
   const renderContent = () => {
     if (viewingUser) {
@@ -1437,7 +1637,12 @@ export default function SuperAdminDashboard() {
                       </div>
                       <div>
                         <Label htmlFor="editEmailBody">Email Body</Label>
-                        <Textarea id="editEmailBody" rows={6} placeholder="Enter email content..." />
+                        <Textarea
+                          id="editEmailBody"
+                          rows={6}
+                          placeholder="Enter email content..."
+                          defaultValue={editingTemplate?.message}
+                        />
                       </div>
                     </>
                   ) : (
@@ -1485,20 +1690,452 @@ export default function SuperAdminDashboard() {
           </div>
         )
 
+      case "system-health":
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">System Health & Monitoring</h1>
+                <p className="text-gray-600">Track system uptime, downtime, and service performance</p>
+              </div>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setShowExportDialog(true)}>
+                <Download className="w-4 h-4 mr-2" />
+                Export Report
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-800">{systemHealthData.uptime}%</div>
+                      <div className="text-sm text-gray-600">Current Uptime</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                      <AlertCircle className="w-6 h-6 text-red-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-800">{systemHealthData.downtime}%</div>
+                      <div className="text-sm text-gray-600">Current Downtime</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Server className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-800">{systemHealthData.totalMonitors}</div>
+                      <div className="text-sm text-gray-600">Monitors Active</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                      <Bell className="w-6 h-6 text-yellow-600" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-gray-800">{systemHealthData.activeAlerts}</div>
+                      <div className="text-sm text-gray-600">Active Alerts</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle>Uptime & Downtime History (Last 6 Months)</CardTitle>
+                <CardDescription>Monthly system availability tracking</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={uptimeHistory} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" angle={-45} textAnchor="end" height={100} />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="uptime" fill="#10b981" name="Uptime %" />
+                    <Bar dataKey="downtime" fill="#ef4444" name="Downtime %" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle>Email Service Metrics</CardTitle>
+                <CardDescription>Email delivery performance and status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Sent Today</p>
+                    <p className="text-2xl font-bold text-blue-600">{emailServiceData.sentToday}</p>
+                  </div>
+                  <div className="p-4 bg-yellow-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Pending</p>
+                    <p className="text-2xl font-bold text-yellow-600">{emailServiceData.pendingToday}</p>
+                  </div>
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Failed</p>
+                    <p className="text-2xl font-bold text-red-600">{emailServiceData.failedToday}</p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Avg Delivery Time</p>
+                    <p className="text-2xl font-bold text-green-600">{emailServiceData.avgDeliveryTime}</p>
+                  </div>
+                </div>
+
+                <h3 className="font-semibold text-gray-800 mb-4">Last 7 Days Activity</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={emailHistoryLast7Days}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="sent" stroke="#3b82f6" name="Sent" strokeWidth={2} />
+                    <Line type="monotone" dataKey="pending" stroke="#f59e0b" name="Pending" strokeWidth={2} />
+                    <Line type="monotone" dataKey="failed" stroke="#ef4444" name="Failed" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle>System Services Status</CardTitle>
+                <CardDescription>Individual service health and performance</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-4">Services Overview</h4>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <PieChart>
+                        <Pie
+                          data={[
+                            {
+                              name: "Operational",
+                              value: systemServices.filter((s) => s.status === "Operational").length,
+                            },
+                            {
+                              name: "Warning",
+                              value: systemServices.filter((s) => s.status === "Warning").length,
+                            },
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, value }) => `${name}: ${value}`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          <Cell fill="#10b981" />
+                          <Cell fill="#f59e0b" />
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-4">Service Details</h4>
+                    <div className="space-y-3">
+                      {systemServices.map((service, idx) => (
+                        <div key={idx} className="p-3 border rounded-lg hover:bg-gray-50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3 flex-1">
+                              <Server className="w-5 h-5 text-gray-600" />
+                              <div>
+                                <p className="font-medium text-gray-800 text-sm">{service.name}</p>
+                                <p className="text-xs text-gray-600">{service.responseTime}</p>
+                              </div>
+                            </div>
+                            <Badge
+                              className={
+                                service.status === "Operational"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }
+                            >
+                              {service.uptime}%
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle>Last System Check</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Clock className="w-5 h-5" />
+                  <span>Last checked: {systemHealthData.lastChecked}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+
+      case "notifications":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">System Notifications</h1>
+              <p className="text-gray-600">View all system notifications and alerts</p>
+            </div>
+
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle>Notification Controls</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">Search Notifications</label>
+                    <Input
+                      placeholder="Search by title or message..."
+                      value={notificationSearch}
+                      onChange={(e) => {
+                        setNotificationSearch(e.target.value)
+                        setNotificationPage(1)
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">Filter by Type</label>
+                    <div className="flex gap-2 flex-wrap">
+                      {["all", "success", "warning", "error", "info"].map((type) => (
+                        <Button
+                          key={type}
+                          variant={notificationFilter === type ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            setNotificationFilter(type as any)
+                            setNotificationPage(1)
+                          }}
+                          className="capitalize"
+                        >
+                          {type}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Showing {paginatedNotifications.length} of {filteredNotifications.length} notifications
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle>All Notifications</CardTitle>
+                <CardDescription>System-wide notifications and alerts</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {paginatedNotifications.length > 0 ? (
+                    paginatedNotifications.map((notif) => {
+                      const getIconColor = () => {
+                        switch (notif.type) {
+                          case "success":
+                            return "text-green-600"
+                          case "warning":
+                            return "text-yellow-600"
+                          case "error":
+                            return "text-red-600"
+                          default:
+                            return "text-blue-600"
+                        }
+                      }
+
+                      const getBgColor = () => {
+                        switch (notif.type) {
+                          case "success":
+                            return "bg-green-50 border-green-200"
+                          case "warning":
+                            return "bg-yellow-50 border-yellow-200"
+                          case "error":
+                            return "bg-red-50 border-red-200"
+                          default:
+                            return "bg-blue-50 border-blue-200"
+                        }
+                      }
+
+                      return (
+                        <div
+                          key={notif.id}
+                          className={`p-4 border rounded-lg hover:shadow-md transition ${getBgColor()}`}
+                        >
+                          <div className="flex items-start space-x-4">
+                            <Bell className={`w-6 h-6 mt-0.5 ${getIconColor()}`} />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-semibold text-gray-800">{notif.title}</h3>
+                                <Badge
+                                  className={
+                                    notif.type === "success"
+                                      ? "bg-green-100 text-green-800"
+                                      : notif.type === "warning"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : notif.type === "error"
+                                          ? "bg-red-100 text-red-800"
+                                          : "bg-blue-100 text-blue-800"
+                                  }
+                                >
+                                  {notif.type.charAt(0).toUpperCase() + notif.type.slice(1)}
+                                </Badge>
+                              </div>
+                              <p className="text-gray-600 text-sm mt-1">{notif.message}</p>
+                              <p className="text-gray-500 text-xs mt-2">{notif.timestamp}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-600">No notifications found</p>
+                    </div>
+                  )}
+                </div>
+
+                {filteredNotifications.length > 0 && (
+                  <div className="flex items-center justify-between mt-6 pt-6 border-t">
+                    <div className="text-sm text-gray-600">
+                      Page {notificationPage} of {totalPages}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setNotificationPage(Math.max(1, notificationPage - 1))}
+                        disabled={notificationPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <Button
+                            key={page}
+                            variant={notificationPage === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setNotificationPage(page)}
+                            className="w-8"
+                          >
+                            {page}
+                          </Button>
+                        ))}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setNotificationPage(Math.min(totalPages, notificationPage + 1))}
+                        disabled={notificationPage === totalPages}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )
+
       default:
         return null
     }
   }
 
   return (
-    <DashboardLayout
-      userRole="super-admin"
-      userName="Admin User"
-      navigation={navigation}
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-    >
-      {renderContent()}
-    </DashboardLayout>
+    <>
+      <DashboardLayout
+        userRole="super-admin"
+        userName="Admin User"
+        navigation={navigation}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      >
+        {renderContent()}
+      </DashboardLayout>
+
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Export System Health Report</DialogTitle>
+            <DialogDescription>Choose file format for the export</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <button
+              onClick={() => handleExport("csv")}
+              className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition flex items-center space-x-3"
+            >
+              <FileText className="w-5 h-5 text-blue-600" />
+              <div>
+                <p className="font-medium text-gray-800">CSV Format</p>
+                <p className="text-sm text-gray-600">Spreadsheet compatible</p>
+              </div>
+            </button>
+            <button
+              onClick={() => handleExport("json")}
+              className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition flex items-center space-x-3"
+            >
+              <FileText className="w-5 h-5 text-green-600" />
+              <div>
+                <p className="font-medium text-gray-800">JSON Format</p>
+                <p className="text-sm text-gray-600">Structured data format</p>
+              </div>
+            </button>
+            <button
+              onClick={() => handleExport("pdf")}
+              className="w-full p-4 text-left border rounded-lg hover:bg-gray-50 transition flex items-center space-x-3"
+            >
+              <FileText className="w-5 h-5 text-red-600" />
+              <div>
+                <p className="font-medium text-gray-800">PDF Format</p>
+                <p className="text-sm text-gray-600">Professional document</p>
+              </div>
+            </button>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExportDialog(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
