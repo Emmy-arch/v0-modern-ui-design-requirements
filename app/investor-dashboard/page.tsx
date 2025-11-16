@@ -6,24 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
-import {
-  Heart,
-  Download,
-  Eye,
-  FileText,
-  User,
-  TrendingUp,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Check,
-  Calendar,
-  MapPin,
-  Building2,
-  Mail,
-  Briefcase,
-} from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Heart, Download, Eye, FileText, User, TrendingUp, Search, ChevronLeft, ChevronRight, X, Check, Calendar, MapPin, Building2, Mail, Briefcase, Plus } from 'lucide-react'
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { ProjectCard } from "@/components/project-card"
 import { StatusTimeline } from "@/components/status-timeline"
@@ -363,14 +347,82 @@ export default function InvestorDashboard() {
   const [selectedInterest, setSelectedInterest] = useState(null)
   const interestsPerPage = 3
 
+  const [myProjects, setMyProjects] = useState([])
+  const [showProjectForm, setShowProjectForm] = useState(false)
+  const [selectedMyProject, setSelectedMyProject] = useState(null)
+  const [formData, setFormData] = useState({
+    project_name: "",
+    project_description: "",
+    investment_opportunity: "",
+    location: "",
+    sector: "",
+    implementing_MGAs: "",
+    project_contact: "",
+    project_type: "Greenfield",
+    investment_type: "",
+    project_incentives: "",
+    project_status: "Planning",
+    project_image: "/custom-project.jpg",
+    documents: null,
+  })
+  const [formErrors, setFormErrors] = useState({})
+
   const projectsPerPage = 6
 
   const navigation = [
     { name: "Available Projects", id: "projects", icon: TrendingUp },
+    { name: "My Projects", id: "my-projects", icon: Plus },
     { name: "My Interests", id: "interests", icon: Heart },
     { name: "Documents", id: "documents", icon: FileText },
     { name: "Settings", id: "settings", icon: User },
   ]
+
+  const validateProjectForm = () => {
+    const errors = {}
+    if (!formData.project_name.trim()) errors.project_name = "Project name is required"
+    if (!formData.project_description.trim()) errors.project_description = "Description is required"
+    if (!formData.location.trim()) errors.location = "Location is required"
+    if (!formData.sector.trim()) errors.sector = "Sector is required"
+    if (!formData.project_contact.trim()) errors.project_contact = "Contact is required"
+    if (!formData.documents) errors.documents = "Document is required"
+    return errors
+  }
+
+  const handleProjectSubmit = () => {
+    const errors = validateProjectForm()
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors)
+      return
+    }
+
+    const newProject = {
+      id: `MY-PROJECT-${Date.now()}`,
+      ...formData,
+      project_status: "Pending",
+      isInterested: false,
+      brochures: [],
+      approvalStatus: "Pending",
+    }
+
+    setMyProjects([...myProjects, newProject])
+    setShowProjectForm(false)
+    setFormData({
+      project_name: "",
+      project_description: "",
+      investment_opportunity: "",
+      location: "",
+      sector: "",
+      implementing_MGAs: "",
+      project_contact: "",
+      project_type: "Greenfield",
+      investment_type: "",
+      project_incentives: "",
+      project_status: "Planning",
+      project_image: "/custom-project.jpg",
+      documents: null,
+    })
+    setFormErrors({})
+  }
 
   // Filter projects based on search term
   const filteredProjects = projects.filter(
@@ -418,6 +470,256 @@ export default function InvestorDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "my-projects":
+        if (selectedMyProject) {
+          return (
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <Button variant="outline" onClick={() => setSelectedMyProject(null)} className="bg-transparent">
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Back to My Projects
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                  <Card className="shadow-lg border-0">
+                    <div className="relative">
+                      <img
+                        src={selectedMyProject.project_image || "/placeholder.svg?height=300&width=600&query=project"}
+                        alt={selectedMyProject.project_name}
+                        className="w-full h-72 object-cover rounded-t-lg"
+                      />
+                      <div className="absolute top-4 right-4">
+                        <Badge
+                          className={
+                            selectedMyProject.project_status === "Approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }
+                        >
+                          {selectedMyProject.approvalStatus}
+                        </Badge>
+                      </div>
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="text-3xl mb-4">{selectedMyProject.project_name}</CardTitle>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {selectedMyProject.location}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Building2 className="w-4 h-4" />
+                          {selectedMyProject.sector}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Briefcase className="w-4 h-4" />
+                          {selectedMyProject.project_type}
+                        </span>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <h3 className="font-semibold text-gray-800 mb-3 text-lg">Project Overview</h3>
+                        <p className="text-gray-600 leading-relaxed">{selectedMyProject.project_description}</p>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold text-gray-800 mb-3 text-lg">Investment Opportunity</h3>
+                        <p className="text-gray-600 leading-relaxed">{selectedMyProject.investment_opportunity}</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-lg p-6">
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Project Type</p>
+                          <p className="font-semibold text-gray-800">{selectedMyProject.project_type}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Investment Type</p>
+                          <p className="font-semibold text-gray-800">{selectedMyProject.investment_type}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Sector</p>
+                          <p className="font-semibold text-gray-800">{selectedMyProject.sector}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Approval Status</p>
+                          <Badge
+                            className={
+                              selectedMyProject.approvalStatus === "Approved"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }
+                          >
+                            {selectedMyProject.approvalStatus}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {selectedMyProject.project_incentives && (
+                        <div>
+                          <h3 className="font-semibold text-gray-800 mb-3 text-lg">Project Incentives</h3>
+                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <p className="text-purple-800">{selectedMyProject.project_incentives}</p>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-6">
+                  <Card className="shadow-lg border-0">
+                    <CardHeader>
+                      <CardTitle>Project Status</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-4">
+                        <div className="flex justify-between pb-3 border-b">
+                          <span className="text-gray-600">Status</span>
+                          <Badge
+                            className={
+                              selectedMyProject.approvalStatus === "Approved"
+                                ? "bg-green-100 text-green-800"
+                                : selectedMyProject.approvalStatus === "Rejected"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                            }
+                          >
+                            {selectedMyProject.approvalStatus}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between pb-3 border-b">
+                          <span className="text-gray-600">Project Type</span>
+                          <span className="font-medium">{selectedMyProject.project_type}</span>
+                        </div>
+                        <div className="flex justify-between pb-3 border-b">
+                          <span className="text-gray-600">Location</span>
+                          <span className="font-medium">{selectedMyProject.location}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Sector</span>
+                          <span className="font-medium">{selectedMyProject.sector}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-lg border-0">
+                    <CardHeader>
+                      <CardTitle>Contact Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Project Contact</p>
+                        <p className="font-medium text-gray-800">{selectedMyProject.project_contact}</p>
+                      </div>
+                      {selectedMyProject.implementing_MGAs && (
+                        <div className="space-y-2 pt-3 border-t">
+                          <p className="text-sm text-gray-600 mb-1">Implementing MGA</p>
+                          <p className="font-medium text-gray-800">{selectedMyProject.implementing_MGAs}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        return (
+          <div className="space-y-6">
+            <div className="bg-gradient-to-r from-blue-800 to-blue-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold mb-2">My Projects</h1>
+                  <p className="text-blue-100">Submit and manage your custom PPP projects</p>
+                </div>
+                <Button
+                  className="bg-white text-blue-700 hover:bg-gray-100"
+                  onClick={() => setShowProjectForm(true)}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Project
+                </Button>
+              </div>
+            </div>
+
+            {myProjects.length === 0 ? (
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-12 text-center">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Plus className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">No Projects Submitted Yet</h3>
+                  <p className="text-gray-600 mb-6">
+                    Submit your custom PPP project for review by the Head of Department
+                  </p>
+                  <Button
+                    className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+                    onClick={() => setShowProjectForm(true)}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Submit Your First Project
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {myProjects.map((project) => (
+                  <div key={project.id} className="cursor-pointer" onClick={() => setSelectedMyProject(project)}>
+                    <Card className="shadow-lg border-0 h-full hover:shadow-xl transition-shadow">
+                      <div className="relative">
+                        <img
+                          src={project.project_image || "/placeholder.svg"}
+                          alt={project.project_name}
+                          className="w-full h-40 object-cover rounded-t-lg"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <Badge
+                            className={
+                              project.approvalStatus === "Approved"
+                                ? "bg-green-100 text-green-800"
+                                : project.approvalStatus === "Rejected"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                            }
+                          >
+                            {project.approvalStatus}
+                          </Badge>
+                        </div>
+                      </div>
+                      <CardHeader>
+                        <CardTitle className="text-lg line-clamp-2">{project.project_name}</CardTitle>
+                        <CardDescription className="line-clamp-2">{project.project_description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <MapPin className="w-4 h-4" />
+                          <span>{project.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Building2 className="w-4 h-4" />
+                          <span>{project.sector}</span>
+                        </div>
+                        <Button
+                          className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+                          onClick={() => setSelectedMyProject(project)}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+
       case "projects":
         if (selectedProject) {
           return (
@@ -1709,6 +2011,228 @@ export default function InvestorDashboard() {
       >
         {renderContent()}
       </DashboardLayout>
+
+      {showProjectForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full my-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-semibold text-gray-800">Submit New Project</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowProjectForm(false)}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* Project Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Project Name <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  placeholder="Enter project name"
+                  value={formData.project_name}
+                  onChange={(e) => {
+                    setFormData({ ...formData, project_name: e.target.value })
+                    if (formErrors.project_name) setFormErrors({ ...formErrors, project_name: "" })
+                  }}
+                  className={formErrors.project_name ? "border-red-500" : ""}
+                />
+                {formErrors.project_name && <p className="text-red-500 text-sm mt-1">{formErrors.project_name}</p>}
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <Textarea
+                  placeholder="Describe your project"
+                  rows={3}
+                  value={formData.project_description}
+                  onChange={(e) => {
+                    setFormData({ ...formData, project_description: e.target.value })
+                    if (formErrors.project_description) setFormErrors({ ...formErrors, project_description: "" })
+                  }}
+                  className={formErrors.project_description ? "border-red-500" : ""}
+                />
+                {formErrors.project_description && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.project_description}</p>
+                )}
+              </div>
+
+              {/* Investment Opportunity */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Investment Opportunity</label>
+                <Textarea
+                  placeholder="Describe investment opportunities"
+                  rows={2}
+                  value={formData.investment_opportunity}
+                  onChange={(e) => setFormData({ ...formData, investment_opportunity: e.target.value })}
+                />
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  placeholder="Project location"
+                  value={formData.location}
+                  onChange={(e) => {
+                    setFormData({ ...formData, location: e.target.value })
+                    if (formErrors.location) setFormErrors({ ...formErrors, location: "" })
+                  }}
+                  className={formErrors.location ? "border-red-500" : ""}
+                />
+                {formErrors.location && <p className="text-red-500 text-sm mt-1">{formErrors.location}</p>}
+              </div>
+
+              {/* Sector */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sector <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  placeholder="Project sector (ICT, Infrastructure, etc.)"
+                  value={formData.sector}
+                  onChange={(e) => {
+                    setFormData({ ...formData, sector: e.target.value })
+                    if (formErrors.sector) setFormErrors({ ...formErrors, sector: "" })
+                  }}
+                  className={formErrors.sector ? "border-red-500" : ""}
+                />
+                {formErrors.sector && <p className="text-red-500 text-sm mt-1">{formErrors.sector}</p>}
+              </div>
+
+              {/* Implementing MGAs */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Implementing MGAs</label>
+                <Input
+                  placeholder="Ministry/Agency coordinating the project"
+                  value={formData.implementing_MGAs}
+                  onChange={(e) => setFormData({ ...formData, implementing_MGAs: e.target.value })}
+                />
+              </div>
+
+              {/* Contact */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contact <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  placeholder="Email or phone contact"
+                  type="email"
+                  value={formData.project_contact}
+                  onChange={(e) => {
+                    setFormData({ ...formData, project_contact: e.target.value })
+                    if (formErrors.project_contact) setFormErrors({ ...formErrors, project_contact: "" })
+                  }}
+                  className={formErrors.project_contact ? "border-red-500" : ""}
+                />
+                {formErrors.project_contact && <p className="text-red-500 text-sm mt-1">{formErrors.project_contact}</p>}
+              </div>
+
+              {/* Type (Always Greenfield) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  placeholder="Type"
+                  value={formData.project_type}
+                  disabled
+                  className="bg-gray-100"
+                />
+                <p className="text-xs text-gray-500 mt-1">Always set to Greenfield</p>
+              </div>
+
+              {/* Investment Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Investment Type</label>
+                <Input
+                  placeholder="Equity, Debt, or Mixed"
+                  value={formData.investment_type}
+                  onChange={(e) => setFormData({ ...formData, investment_type: e.target.value })}
+                />
+              </div>
+
+              {/* Incentives */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Incentives</label>
+                <Textarea
+                  placeholder="Project incentives"
+                  rows={2}
+                  value={formData.project_incentives}
+                  onChange={(e) => setFormData({ ...formData, project_incentives: e.target.value })}
+                />
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <select
+                  value={formData.project_status}
+                  onChange={(e) => setFormData({ ...formData, project_status: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Planning">Planning</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+
+              {/* Document Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Document <span className="text-red-500">*</span>
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition">
+                  <input
+                    type="file"
+                    className="hidden"
+                    id="document-upload"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        setFormData({ ...formData, documents: e.target.files[0] })
+                        if (formErrors.documents) setFormErrors({ ...formErrors, documents: "" })
+                      }
+                    }}
+                  />
+                  <label htmlFor="document-upload" className="cursor-pointer">
+                    <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm font-medium text-gray-600">
+                      {formData.documents ? formData.documents.name : "Click to upload or drag and drop"}
+                    </p>
+                    <p className="text-xs text-gray-500">PDF, DOC, or DOCX files</p>
+                  </label>
+                </div>
+                {formErrors.documents && <p className="text-red-500 text-sm mt-1">{formErrors.documents}</p>}
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-6 border-t mt-6">
+              <Button
+                className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+                onClick={handleProjectSubmit}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Submit Project
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 bg-transparent"
+                onClick={() => {
+                  setShowProjectForm(false)
+                  setFormErrors({})
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Interest Confirmation Modal */}
       {showInterestModal && (

@@ -5,20 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  FileText,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Eye,
-  MessageSquare,
-  TrendingUp,
-  Clock,
-  Users,
-  Download,
-  RefreshCw,
-  X,
-} from "lucide-react"
+import { FileText, CheckCircle, XCircle, AlertTriangle, Eye, MessageSquare, TrendingUp, Clock, Users, Download, RefreshCw, X, ChevronLeft, MapPin, Building2, Briefcase, Mail } from 'lucide-react'
 import { DashboardLayout } from "@/components/dashboard-layout"
 
 const businessProposals = [
@@ -73,10 +60,13 @@ export default function HoDDashboard() {
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showRefurbishmentModal, setShowRefurbishmentModal] = useState(false)
   const [refurbishmentReason, setRefurbishmentReason] = useState("")
+  const [submittedProjects, setSubmittedProjects] = useState([])
+  const [selectedSubmittedProject, setSelectedSubmittedProject] = useState(null)
 
   const navigation = [
     { name: "Overview", id: "overview", icon: TrendingUp },
     { name: "Business Proposals", id: "proposals", icon: FileText },
+    { name: "Submitted Projects", id: "submitted-projects", icon: Building2 },
     { name: "Refurbishment Requests", id: "refurbishment", icon: RefreshCw },
     { name: "Messages", id: "messages", icon: MessageSquare },
   ]
@@ -104,6 +94,17 @@ export default function HoDDashboard() {
     setShowRefurbishmentModal(false)
     setSelectedProposal(null)
     setRefurbishmentReason("")
+  }
+
+  const handleApproveProject = (projectId) => {
+    setSubmittedProjects((prev) =>
+      prev.map((project) =>
+        project.id === projectId
+          ? { ...project, approvalStatus: "Approved" }
+          : project,
+      ),
+    )
+    setSelectedSubmittedProject(null)
   }
 
   const renderContent = () => {
@@ -348,62 +349,311 @@ export default function HoDDashboard() {
           </div>
         )
 
-      case "refurbishment":
+      case "submitted-projects":
+        if (selectedSubmittedProject) {
+          return (
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <Button variant="outline" onClick={() => setSelectedSubmittedProject(null)} className="bg-transparent">
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Back to Projects
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                  <Card className="shadow-lg border-0">
+                    <div className="relative">
+                      <img
+                        src={
+                          selectedSubmittedProject.project_image ||
+                          "/placeholder.svg?height=300&width=600&query=project"
+                         || "/placeholder.svg"}
+                        alt={selectedSubmittedProject.project_name}
+                        className="w-full h-72 object-cover rounded-t-lg"
+                      />
+                      <div className="absolute top-4 right-4">
+                        <Badge
+                          className={
+                            selectedSubmittedProject.approvalStatus === "Approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }
+                        >
+                          {selectedSubmittedProject.approvalStatus}
+                        </Badge>
+                      </div>
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="text-3xl mb-4">{selectedSubmittedProject.project_name}</CardTitle>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {selectedSubmittedProject.location}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Building2 className="w-4 h-4" />
+                          {selectedSubmittedProject.sector}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Briefcase className="w-4 h-4" />
+                          {selectedSubmittedProject.project_type}
+                        </span>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <h3 className="font-semibold text-gray-800 mb-3 text-lg">Project Overview</h3>
+                        <p className="text-gray-600 leading-relaxed">
+                          {selectedSubmittedProject.project_description}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold text-gray-800 mb-3 text-lg">Investment Opportunity</h3>
+                        <p className="text-gray-600 leading-relaxed">
+                          {selectedSubmittedProject.investment_opportunity}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-lg p-6">
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Project Type</p>
+                          <p className="font-semibold text-gray-800">{selectedSubmittedProject.project_type}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Investment Type</p>
+                          <p className="font-semibold text-gray-800">{selectedSubmittedProject.investment_type}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Sector</p>
+                          <p className="font-semibold text-gray-800">{selectedSubmittedProject.sector}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Status</p>
+                          <Badge
+                            className={
+                              selectedSubmittedProject.approvalStatus === "Approved"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }
+                          >
+                            {selectedSubmittedProject.approvalStatus}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {selectedSubmittedProject.project_incentives && (
+                        <div>
+                          <h3 className="font-semibold text-gray-800 mb-3 text-lg">Project Incentives</h3>
+                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <p className="text-purple-800">{selectedSubmittedProject.project_incentives}</p>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-6">
+                  <Card className="shadow-lg border-0">
+                    <CardHeader>
+                      <CardTitle>Project Status</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-4">
+                        <div className="flex justify-between pb-3 border-b">
+                          <span className="text-gray-600">Status</span>
+                          <Badge
+                            className={
+                              selectedSubmittedProject.approvalStatus === "Approved"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }
+                          >
+                            {selectedSubmittedProject.approvalStatus}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between pb-3 border-b">
+                          <span className="text-gray-600">Type</span>
+                          <span className="font-medium">{selectedSubmittedProject.project_type}</span>
+                        </div>
+                        <div className="flex justify-between pb-3 border-b">
+                          <span className="text-gray-600">Location</span>
+                          <span className="font-medium">{selectedSubmittedProject.location}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Sector</span>
+                          <span className="font-medium">{selectedSubmittedProject.sector}</span>
+                        </div>
+                      </div>
+
+                      {selectedSubmittedProject.approvalStatus === "Pending" && (
+                        <Button
+                          className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => handleApproveProject(selectedSubmittedProject.id)}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Approve Project
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-lg border-0">
+                    <CardHeader>
+                      <CardTitle>Investor Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Submitted By</p>
+                        <p className="font-medium text-gray-800">{selectedSubmittedProject.investorName}</p>
+                      </div>
+                      <div className="space-y-2 pt-3 border-t">
+                        <div className="flex items-center space-x-2">
+                          <Mail className="w-4 h-4 text-gray-600" />
+                          <a
+                            href={`mailto:${selectedSubmittedProject.investorEmail}`}
+                            className="text-blue-600 hover:underline text-sm"
+                          >
+                            {selectedSubmittedProject.investorEmail}
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
         return (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Refurbishment Requests</h1>
-              <p className="text-gray-600">Manage all refurbishment requests</p>
+              <h1 className="text-2xl font-bold text-gray-800">Submitted Projects</h1>
+              <p className="text-gray-600">Review projects submitted by investors</p>
             </div>
 
-            {proposals
-              .filter((p) => p.status === "Refurbishment Requested")
-              .map((proposal) => (
-                <Card key={proposal.id} className="shadow-lg border-0">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-800">{proposal.projectTitle}</h3>
-                        <p className="text-sm text-gray-600">
-                          {proposal.investorName} • {proposal.projectId}
-                        </p>
-                      </div>
-                      <Badge className="bg-blue-100 text-blue-800">Refurbishment Requested</Badge>
-                    </div>
-
-                    <div className="bg-yellow-50 rounded-lg p-4 mb-6">
-                      <h4 className="font-semibold text-yellow-800 mb-2">Refurbishment Reason</h4>
-                      <p className="text-yellow-700">{proposal.hodReason}</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <div className="bg-blue-50 p-4 rounded-lg">
-                        <p className="text-sm text-blue-600 mb-1">Investment Amount</p>
-                        <p className="font-semibold text-blue-800">{proposal.investmentAmount}</p>
-                      </div>
-                      <div className="bg-green-50 p-4 rounded-lg">
-                        <p className="text-sm text-green-600 mb-1">Expected ROI</p>
-                        <p className="font-semibold text-green-800">{proposal.expectedROI}</p>
-                      </div>
-                      <div className="bg-purple-50 p-4 rounded-lg">
-                        <p className="text-sm text-purple-600 mb-1">Decision Date</p>
-                        <p className="font-semibold text-purple-800">{proposal.decisionDate}</p>
+            {submittedProjects.length === 0 ? (
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-12 text-center">
+                  <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">No Submitted Projects</h3>
+                  <p className="text-gray-600">Projects submitted by investors will appear here</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {submittedProjects.map((project) => (
+                  <Card key={project.id} className="shadow-lg border-0 hover:shadow-xl transition-shadow cursor-pointer">
+                    <div className="relative">
+                      <img
+                        src={project.project_image || "/placeholder.svg"}
+                        alt={project.project_name}
+                        className="w-full h-40 object-cover rounded-t-lg"
+                      />
+                      <div className="absolute top-2 right-2">
+                        <Badge
+                          className={
+                            project.approvalStatus === "Approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }
+                        >
+                          {project.approvalStatus}
+                        </Badge>
                       </div>
                     </div>
-
-                    <div className="flex space-x-3">
-                      <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Approved Refurbishment
-                      </Button>
-                      <Button variant="outline" className="flex-1 bg-transparent">
+                    <CardHeader>
+                      <CardTitle className="text-lg line-clamp-2">{project.project_name}</CardTitle>
+                      <CardDescription>{project.investorName}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-gray-600 line-clamp-2">{project.project_description}</p>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="w-4 h-4" />
+                        <span>{project.location}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Building2 className="w-4 h-4" />
+                        <span>{project.sector}</span>
+                      </div>
+                      <Button
+                        className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+                        onClick={() => setSelectedSubmittedProject(project)}
+                      >
                         <Eye className="w-4 h-4 mr-2" />
-                        Request More Info
+                        View Details
                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+
+      case "refurbishment":
+        return (
+          <div className="space-y-6">
+            {/* Proposals Requiring Your Review */}
+            <Card className="shadow-lg border-0">
+              <CardHeader>
+                <CardTitle>Refurbishment Requests</CardTitle>
+                <CardDescription>Manage all refurbishment requests</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {proposals
+                    .filter((p) => p.status === "Refurbishment Requested")
+                    .map((proposal) => (
+                      <div key={proposal.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className="font-semibold text-lg text-gray-800">{proposal.projectTitle}</h3>
+                            <p className="text-sm text-gray-600">
+                              {proposal.investorName} • {proposal.projectId}
+                            </p>
+                          </div>
+                          <Badge className="bg-blue-100 text-blue-800">Refurbishment Requested</Badge>
+                        </div>
+
+                        <div className="bg-yellow-50 rounded-lg p-4 mb-6">
+                          <h4 className="font-semibold text-yellow-800 mb-2">Refurbishment Reason</h4>
+                          <p className="text-yellow-700">{proposal.hodReason}</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <p className="text-sm text-blue-600 mb-1">Investment Amount</p>
+                            <p className="font-semibold text-blue-800">{proposal.investmentAmount}</p>
+                          </div>
+                          <div className="bg-green-50 p-4 rounded-lg">
+                            <p className="text-sm text-green-600 mb-1">Expected ROI</p>
+                            <p className="font-semibold text-green-800">{proposal.expectedROI}</p>
+                          </div>
+                          <div className="bg-purple-50 p-4 rounded-lg">
+                            <p className="text-sm text-purple-600 mb-1">Decision Date</p>
+                            <p className="font-semibold text-purple-800">{proposal.decisionDate}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex space-x-3">
+                          <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Approved Refurbishment
+                          </Button>
+                          <Button variant="outline" className="flex-1 bg-transparent">
+                            <Eye className="w-4 h-4 mr-2" />
+                            Request More Info
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
 
             {proposals.filter((p) => p.status === "Refurbishment Requested").length === 0 && (
               <Card className="shadow-lg border-0">
